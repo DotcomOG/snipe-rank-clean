@@ -6,7 +6,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const resultContainer = document.getElementById('resultContainer');
   const contactForm = document.getElementById('contactForm');
   const fullReportForm = document.getElementById('fullReportForm');
-  const fullReportContainer = document.getElementById('fullReportContainer');
 
   let currentURL = '';
 
@@ -76,48 +75,15 @@ document.addEventListener('DOMContentLoaded', () => {
   fullReportForm.addEventListener('submit', (e) => {
     e.preventDefault();
 
-    if (!currentURL) {
-      alert('Please analyze a URL first.');
+    const name = document.getElementById('nameInput').value.trim();
+    const email = document.getElementById('emailInput').value.trim();
+
+    if (!currentURL || !name || !email) {
+      alert('Please analyze a URL and fill in all fields.');
       return;
     }
 
-    fullReportContainer.classList.remove('hidden');
-    fullReportContainer.innerHTML = 'Loading full report...';
-
-    fetch(`/api/full?url=${encodeURIComponent(currentURL)}`)
-      .then(res => res.json())
-      .then(data => {
-        console.log('Full report:', data);
-        displayFullReport(data);
-      })
-      .catch(err => {
-        console.error('Error fetching full report:', err);
-        fullReportContainer.innerHTML = 'There was a problem retrieving the full report.';
-      });
+    const target = `full-report.html?url=${encodeURIComponent(currentURL)}&name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}`;
+    window.location.href = target;
   });
-
-  function displayFullReport(data) {
-    fullReportContainer.innerHTML = `
-      <h2 class="text-2xl font-bold mb-4">Full AI SEO Report</h2>
-      <p class="mb-2"><strong>Score:</strong> ${data.score ?? 'N/A'}/100</p>
-      <div class="mb-4">
-        <h3 class="text-xl font-semibold mb-1">AI Superpowers</h3>
-        <ul class="list-disc list-inside space-y-2">
-          ${(data.superpowers || []).map(item => `<li>${item}</li>`).join('')}
-        </ul>
-      </div>
-      <div class="mb-4">
-        <h3 class="text-xl font-semibold mb-1">AI SEO Opportunities</h3>
-        <ul class="list-disc list-inside space-y-2">
-          ${(data.opportunities || []).map(item => `<li>${item}</li>`).join('')}
-        </ul>
-      </div>
-      <div>
-        <h3 class="text-xl font-semibold mb-1">AI Engine Insights</h3>
-        <ul class="list-disc list-inside space-y-2">
-          ${(data.insights || []).map(item => `<li>${item}</li>`).join('')}
-        </ul>
-      </div>
-    `;
-  }
 });
