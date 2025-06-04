@@ -5,6 +5,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const loadingMessage = document.getElementById('loadingMessage');
   const resultContainer = document.getElementById('resultContainer');
   const contactForm = document.getElementById('contactForm');
+  const fullReportForm = document.getElementById('fullReportForm');
+  const fullReportContainer = document.getElementById('fullReportContainer');
+
+  let currentURL = '';
 
   submitBtn.addEventListener('click', handleAnalyze);
   urlInput.addEventListener('keydown', (e) => {
@@ -17,6 +21,8 @@ document.addEventListener('DOMContentLoaded', () => {
   function handleAnalyze() {
     const url = urlInput.value.trim();
     if (!url) return alert('Please enter a valid URL.');
+
+    currentURL = url;
 
     modal.classList.add('hidden');
     loadingMessage.textContent = 'SnipeRank is analyzing. It may take up to a minute.';
@@ -40,7 +46,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('resultUrl').textContent = `Analyzed URL: ${data.url || 'N/A'}`;
     document.getElementById('scoreValue').textContent = data.score ?? 'N/A';
 
-    // Superpowers
     const superpowersList = document.getElementById('superpowersList');
     superpowersList.innerHTML = '';
     (data.superpowers || []).forEach(item => {
@@ -49,7 +54,6 @@ document.addEventListener('DOMContentLoaded', () => {
       superpowersList.appendChild(li);
     });
 
-    // Opportunities (as plain paragraphs)
     const opportunitiesList = document.getElementById('opportunitiesList');
     opportunitiesList.innerHTML = '';
     (data.opportunities || []).forEach(item => {
@@ -58,7 +62,6 @@ document.addEventListener('DOMContentLoaded', () => {
       opportunitiesList.appendChild(li);
     });
 
-    // AI Engine Insights
     const aiInsightsList = document.getElementById('aiInsightsList');
     aiInsightsList.innerHTML = '';
     (data.insights || []).forEach(item => {
@@ -68,5 +71,53 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     contactForm.classList.remove('hidden');
+  }
+
+  fullReportForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    if (!currentURL) {
+      alert('Please analyze a URL first.');
+      return;
+    }
+
+    fullReportContainer.classList.remove('hidden');
+    fullReportContainer.innerHTML = 'Loading full report...';
+
+    fetch(`/api/full?url=${encodeURIComponent(currentURL)}`)
+      .then(res => res.json())
+      .then(data => {
+        console.log('Full report:', data);
+        displayFullReport(data);
+      })
+      .catch(err => {
+        console.error('Error fetching full report:', err);
+        fullReportContainer.innerHTML = 'There was a problem retrieving the full report.';
+      });
+  });
+
+  function displayFullReport(data) {
+    fullReportContainer.innerHTML = `
+      <h2 class="text-2xl font-bold mb-4">Full AI SEO Report</h2>
+      <p class="mb-2"><strong>Score:</strong> ${data.score ?? 'N/A'}/100</p>
+      <div class="mb-4">
+        <h3 class="text-xl font-semibold mb-1">AI Superpowers</h3>
+        <ul class="list-disc list-inside space-y-2">
+          ${(data.superpowers || []).map(item => `<li>${item}</li>`).join('')}
+        </ul>
+      </div>
+      <div class="mb-4">
+        <h3 class="text-xl font-semibold mb-1">AI SEO Opportunities</h3>
+        <ul class="list-disc list-inside space-y-2">
+          ${(data.opportunities || []).map(item => `<li>${item}</li>`).join('')}
+        </ul>
+      </div>
+      <div>
+        <h3 class="text-xl font-semibold mb-1">AI Engine Insights</h3>
+        <ul class="list-disc list-inside space-y-2">
+          ${(data.insights || []).map(item => `<li>${item}</li>`).join('')}
+        </ul>
+      </div>
+    `;
   }
 });
