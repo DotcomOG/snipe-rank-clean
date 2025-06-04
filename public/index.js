@@ -49,16 +49,12 @@ document.addEventListener('DOMContentLoaded', () => {
       superpowersList.appendChild(li);
     });
 
-    // Opportunities (with proper formatting)
+    // Opportunities (as plain paragraphs)
     const opportunitiesList = document.getElementById('opportunitiesList');
     opportunitiesList.innerHTML = '';
-    (data.opportunities || []).forEach(op => {
+    (data.opportunities || []).forEach(item => {
       const li = document.createElement('li');
-      li.innerHTML = `
-        <strong>Issue:</strong> ${op.issue}<br>
-        <strong>Why it matters:</strong> ${op.importance}<br>
-        <strong>How to fix:</strong> ${op.solution}
-      `;
+      li.textContent = item;
       opportunitiesList.appendChild(li);
     });
 
