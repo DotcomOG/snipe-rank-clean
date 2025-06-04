@@ -1,6 +1,6 @@
+import OpenAI from 'openai';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
-import OpenAI from 'openai';
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -14,11 +14,23 @@ export default async function handler(req, res) {
     const bodyText = $('body').text().replace(/\s+/g, ' ').trim().slice(0, 5000);
 
     const prompt = `
-You are an AI SEO analyst. A user has submitted the following webpage content:
+You are an AI SEO expert. A user has submitted the following webpage content for analysis:
 
 "${bodyText}"
 
-Return a JSON object in this format:
+Your job is to:
+1. Assign an overall AI SEO score (from 1 to 100)
+2. List 5 AI SEO Superpowers (what’s working well)
+3. List 10 AI SEO Opportunities (what’s missing or hurting performance)
+   - Each opportunity must be 3–5 lines
+   - Explain in layman's terms:
+     - What’s wrong
+     - Why it matters for AI-powered search (not just traditional SEO)
+     - How to begin addressing it
+4. List 5 short AI Engine Insights — one-line notes per engine (Gemini, ChatGPT, Copilot, Perplexity)
+
+Return ONLY this JSON format:
+
 {
   "url": "Submitted URL",
   "score": 82,
@@ -26,8 +38,8 @@ Return a JSON object in this format:
   "opportunities": [...],
   "insights": [...]
 }
-Only return valid JSON.
-    `;
+No extra formatting. No code blocks. No commentary. Only valid JSON.
+`;
 
     const chat = await openai.chat.completions.create({
       model: 'gpt-4',
@@ -36,6 +48,7 @@ Only return valid JSON.
     });
 
     const output = chat.choices[0].message.content;
+
     try {
       const parsed = JSON.parse(output);
       parsed.url = url;
@@ -49,4 +62,3 @@ Only return valid JSON.
     return res.status(500).json({ error: 'Failed to analyze URL', detail: err.message });
   }
 }
-
