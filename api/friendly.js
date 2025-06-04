@@ -19,20 +19,20 @@ You are an AI SEO expert. A user has submitted the following webpage content for
 "${bodyText}"
 
 Your job is to:
-1. Assign an overall AI SEO score (from 1 to 100)
+1. Assign an overall AI SEO score (1–100)
 
-2. List 5 AI SEO Superpowers — things the page is doing well
-   - Each item should be 2–4 lines
-   - Explain why this superpower helps the site succeed in AI-powered search
-   - Avoid buzzwords — use clear, persuasive, benefit-focused language
+2. List 5 AI SEO Superpowers — features that work well
+   - Each item must be 2–4 sentences
+   - Focus on how the feature helps visibility, indexing, trust, or clickability in AI-driven search
 
-3. List 10 AI SEO Opportunities — areas that need improvement
-   - Each opportunity must include:
-     - A one-line description of the issue
-     - A 3–5 line explanation (in layman's terms) of why it matters for AI-powered search
-     - DO NOT include a solution or how to fix it
+3. List 10 AI SEO Opportunities — serious issues or gaps
+   - Each item must be a full paragraph (3–5 sentences)
+   - Describe the issue in persuasive, non-technical terms
+   - Emphasize the consequences for AI visibility, reputation, or search reach
+   - DO NOT include solutions or suggestions — let the concern stand on its own
+   - DO NOT include labels like “Issue:” or “Importance:”
 
-4. List 5 AI Engine Insights — short readiness notes for Gemini, ChatGPT, Copilot, and Perplexity
+4. List 5 short AI Engine Insights — one line per engine (Gemini, ChatGPT, Copilot, Perplexity)
 
 Return ONLY this JSON format:
 
@@ -40,16 +40,11 @@ Return ONLY this JSON format:
   "url": "Submitted URL",
   "score": 82,
   "superpowers": ["..."],
-  "opportunities": [
-    {
-      "issue": "...",
-      "importance": "..."
-    }
-  ],
+  "opportunities": ["..."],
   "insights": ["..."]
 }
 
-Only return valid JSON. No extra commentary, no markdown, no code blocks.
+No extra commentary. No markdown. Only valid JSON.
 `;
 
     const chat = await openai.chat.completions.create({
@@ -73,4 +68,3 @@ Only return valid JSON. No extra commentary, no markdown, no code blocks.
     return res.status(500).json({ error: 'Failed to analyze URL', detail: err.message });
   }
 }
-
