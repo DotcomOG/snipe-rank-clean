@@ -1,5 +1,3 @@
-// index.js — Last updated: 2025-06-02 19:25 ET
-
 document.addEventListener('DOMContentLoaded', () => {
   const modal = document.getElementById('urlInputModal');
   const urlInput = document.getElementById('urlInput');
@@ -42,6 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('resultUrl').textContent = `Analyzed URL: ${data.url || 'N/A'}`;
     document.getElementById('scoreValue').textContent = data.score ?? 'N/A';
 
+    // Superpowers
     const superpowersList = document.getElementById('superpowersList');
     superpowersList.innerHTML = '';
     (data.superpowers || []).forEach(item => {
@@ -50,14 +49,20 @@ document.addEventListener('DOMContentLoaded', () => {
       superpowersList.appendChild(li);
     });
 
+    // Opportunities (with proper formatting)
     const opportunitiesList = document.getElementById('opportunitiesList');
     opportunitiesList.innerHTML = '';
-    (data.opportunities || []).forEach(item => {
+    (data.opportunities || []).forEach(op => {
       const li = document.createElement('li');
-      li.textContent = item;
+      li.innerHTML = `
+        <strong>Issue:</strong> ${op.issue}<br>
+        <strong>Why it matters:</strong> ${op.importance}<br>
+        <strong>How to fix:</strong> ${op.solution}
+      `;
       opportunitiesList.appendChild(li);
     });
 
+    // AI Engine Insights
     const aiInsightsList = document.getElementById('aiInsightsList');
     aiInsightsList.innerHTML = '';
     (data.insights || []).forEach(item => {
@@ -69,4 +74,3 @@ document.addEventListener('DOMContentLoaded', () => {
     contactForm.classList.remove('hidden');
   }
 });
-
