@@ -1,6 +1,6 @@
+import OpenAI from 'openai';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
-import OpenAI from 'openai';
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -14,28 +14,38 @@ export default async function handler(req, res) {
     const bodyText = $('body').text().replace(/\s+/g, ' ').trim().slice(0, 7000);
 
     const prompt = `
-You are an advanced AI SEO consultant. A user has submitted a webpage for full AI SEO analysis.
-
-Here is the visible content from their site:
+You are an AI SEO expert. A user has submitted the following webpage content for in-depth analysis:
 
 "${bodyText}"
 
-Please return a fully detailed JSON object ONLY, using this format:
+Your job is to generate a **detailed AI SEO report**. Please provide:
+
+1. An overall AI SEO score (1–100)
+
+2. 5 AI SEO Superpowers
+   - Each superpower should be 2–4 full sentences
+   - Describe how it helps visibility, indexing, authority, or AI search trust
+
+3. 10 AI SEO Opportunities
+   - Each item should be a full paragraph (at least 3–5 sentences)
+   - Use persuasive, plain English
+   - Focus on impact and risks — do not include any “how to fix” instructions
+   - Do not label sections with "issue", "importance", or "solution"
+
+4. 5 one-line AI Engine Insights for Gemini, ChatGPT, Copilot, and Perplexity
+
+Return ONLY this JSON format:
+
 {
   "url": "Submitted URL",
   "score": 87,
-  "superpowers": ["10 detailed strengths with useful commentary"],
-  "opportunities": ["Up to 25 weaknesses, each with an actionable recommendation"],
-  "insights": {
-    "gemini": ["Readiness for Google Gemini/Bard AI"],
-    "chatgpt": ["Readiness for ChatGPT"],
-    "copilot": ["Readiness for Microsoft Copilot"],
-    "perplexity": ["Readiness for Perplexity.ai"]
-  }
+  "superpowers": ["..."],
+  "opportunities": ["..."],
+  "insights": ["..."]
 }
 
-Return only the valid JSON. No explanation or prose.
-    `;
+Do not include markdown, commentary, explanations, or formatting outside the JSON.
+`;
 
     const chat = await openai.chat.completions.create({
       model: 'gpt-4',
@@ -43,26 +53,18 @@ Return only the valid JSON. No explanation or prose.
       messages: [{ role: 'user', content: prompt }],
     });
 
-    const raw = chat.choices[0].message.content;
+    const output = chat.choices[0].message.content;
 
     try {
-      const parsed = JSON.parse(raw);
+      const parsed = JSON.parse(output);
       parsed.url = url;
-      const combinedInsights = [
-        ...(parsed.insights?.gemini || []),
-        ...(parsed.insights?.chatgpt || []),
-        ...(parsed.insights?.copilot || []),
-        ...(parsed.insights?.perplexity || [])
-      ];
-      parsed.insights = combinedInsights;
       return res.status(200).json(parsed);
     } catch (jsonErr) {
-      console.error('JSON parsing error from OpenAI:', raw);
-      return res.status(500).json({ error: 'OpenAI returned invalid JSON.', raw });
+      console.error('Failed to parse OpenAI output:', output);
+      return res.status(500).json({ error: 'Invalid JSON from OpenAI', raw: output });
     }
   } catch (err) {
-    console.error('Full analysis server error:', err);
-    return res.status(500).json({ error: 'Server error during full analysis.', detail: err.message });
+    console.error('Error in /api/full:', err);
+    return res.status(500).json({ error: 'Failed to analyze URL', detail: err.message });
   }
 }
-
