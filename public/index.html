@@ -1,18 +1,21 @@
+<!-- index.html — Last updated: 2025-06-02 19:25 ET -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>SnipeRank – AI SEO Analyzer</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Use prebuilt Tailwind CSS rather than the CDN script to avoid runtime warnings -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.5/dist/tailwind.min.css">
 </head>
 <body class="bg-white text-black font-sans">
 
+  <!-- Header -->
   <header class="text-center py-8">
     <h1 class="text-4xl font-bold">SnipeRank: AI SEO Analyzer</h1>
   </header>
 
-  <!-- URL Lightbox -->
+  <!-- Lightbox URL Entry -->
   <div id="urlInputModal" class="fixed inset-0 bg-black bg-opacity-95 flex items-center justify-center z-50">
     <div class="bg-white text-black rounded-2xl p-6 w-full max-w-md shadow-xl">
       <h2 class="text-xl font-semibold mb-4 text-center">Enter a URL to Analyze</h2>
@@ -26,8 +29,9 @@
     SnipeRank is analyzing. It may take up to a minute.
   </div>
 
-  <!-- Analysis Result -->
+  <!-- Result Container -->
   <div id="resultContainer" class="hidden px-6 py-8 max-w-4xl mx-auto space-y-6">
+
     <div id="resultUrl" class="text-xl font-semibold text-center"></div>
 
     <div id="scoreSection" class="text-center">
@@ -49,20 +53,20 @@
       <ul id="aiInsightsList" class="list-disc list-inside space-y-2"></ul>
     </div>
 
-    <!-- Updated Contact Form -->
-    <div id="contactForm" class="mt-12 border-t border-gray-300 pt-8">
-      <h3 class="text-2xl font-semibold mb-4">Want to dig deeper? Fill in your info for a detailed AI SEO report.</h3>
-      <form id="fullReportForm" class="space-y-4">
-        <input type="text" id="nameInput" placeholder="Name" required class="w-full p-2 rounded border text-black" />
-        <input type="email" id="emailInput" placeholder="Email address" required class="w-full p-2 rounded border text-black" />
-        <button type="submit" class="bg-black text-white px-4 py-2 rounded hover:bg-gray-800">Full Report</button>
+    <div id="contactForm" class="hidden mt-12 border-t border-gray-300 pt-8">
+      <h3 class="text-2xl font-semibold mb-4">Request a Free AI SEO Consultation</h3>
+      <form class="space-y-4">
+        <input type="text" placeholder="Name" class="w-full p-2 rounded border text-black" />
+        <input type="email" placeholder="Email" class="w-full p-2 rounded border text-black" />
+        <input type="tel" placeholder="Phone (optional)" class="w-full p-2 rounded border text-black" />
+        <textarea placeholder="Your message" class="w-full p-2 rounded border text-black h-32"></textarea>
+        <button type="submit" class="bg-black text-white px-4 py-2 rounded hover:bg-gray-800">Send</button>
       </form>
     </div>
 
-    <!-- Full Report Result -->
-    <div id="fullReportContainer" class="hidden mt-10 space-y-6"></div>
   </div>
 
   <script src="index.js"></script>
 </body>
 </html>
+
