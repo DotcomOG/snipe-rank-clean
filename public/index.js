@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const aiInsightsList = document.getElementById('aiInsightsList');
     aiInsightsList.innerHTML = '';
-    (data.insights || []).forEach(item => {
+   (data.engine_insights || data.insights || []).forEach(item => {
       const li = document.createElement('li');
       li.textContent = item;
       aiInsightsList.appendChild(li);

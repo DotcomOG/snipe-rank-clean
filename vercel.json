@@ -7,10 +7,10 @@
     }
   ],
   "routes": [
+    { "src": "/", "dest": "/public/index.html" },
     { "src": "/api/(.*)", "dest": "/api/$1.js" },
     { "src": "/full-report", "dest": "/public/full-report.html" },
     { "src": "/thank-you", "dest": "/public/thank-you.html" },
-    { "src": "/", "dest": "/public/index.html" },
     { "src": "/(.*)", "dest": "/public/$1" }
   ]
 }

@@ -1,6 +1,5 @@
-
 // =========================
-// ✅ api/friendly.js (ESM-safe + debug)
+// ✅ api/friendly.js
 // =========================
 import OpenAI from 'openai';
 import axios from 'axios';
@@ -31,36 +30,8 @@ export default async function handler(req, res) {
     const $ = cheerio.load(html);
     const bodyText = $('body').text().replace(/\s+/g, ' ').trim().slice(0, 6000);
 
-const prompt = `
-You are an AI SEO expert. A user has submitted the following webpage content for analysis:
+    const prompt = `You are an AI SEO expert. Analyze this content: \n\n\"${bodyText}\" \n\nReturn JSON with score (1-100), 5 superpowers (3-5 lines each), 10 opportunities (5 lines each), and 5 engine insights (1 line each).`;
 
-"${bodyText}"
-
-Your task is to return a JSON object with the following structure:
-
-{
-  "url": "Submitted URL",
-  "score": 1–100,
-  "superpowers": [5 detailed items],
-  "opportunities": [10 detailed items],
-  "engine_insights": [5 one-liners: Gemini, ChatGPT, Claude, Copilot, Perplexity]
-}
-
-Each field must follow these rules:
-
-1. "score": A whole number (1–100) summarizing overall AI SEO readiness.
-
-2. "superpowers": Return **exactly 5** bullet points. Each one must be a persuasive paragraph (3–5 full sentences). Focus on strengths that help AI search visibility, indexing, trust, and clickability.
-
-3. "opportunities": Return **exactly 10** bullet points. Each one must be a persuasive paragraph (5–6 full sentences). Focus on what's lacking. Do not include how to fix anything. Highlight the impact this has on AI visibility, brand credibility, or missed reach.
-
-4. "engine_insights": Return 5 one-liner insights — one each from Gemini, ChatGPT, Claude, Copilot, and Perplexity — explaining how the page would likely be interpreted by those AI engines.
-
-Important:
-- Return only the JSON object.
-- No markdown, no commentary.
-- Format strictly for JSON.parse() compliance.
-`;
     let output = '';
     try {
       const chat = await openai.chat.completions.create({
