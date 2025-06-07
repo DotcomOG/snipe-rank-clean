@@ -1,6 +1,3 @@
-# public/index.js
-// index.js — Last updated: 2025-06-02 19:25 ET
-
 document.addEventListener('DOMContentLoaded', () => {
   const modal = document.getElementById('urlInputModal');
   const urlInput = document.getElementById('urlInput');
@@ -8,6 +5,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const loadingMessage = document.getElementById('loadingMessage');
   const resultContainer = document.getElementById('resultContainer');
   const contactForm = document.getElementById('contactForm');
+
+  let currentURL = '';
 
   submitBtn.addEventListener('click', handleAnalyze);
   urlInput.addEventListener('keydown', (e) => {
@@ -20,12 +19,19 @@ document.addEventListener('DOMContentLoaded', () => {
   function handleAnalyze() {
     const url = urlInput.value.trim();
     if (!url) return alert('Please enter a valid URL.');
+    currentURL = url;
 
     modal.classList.add('hidden');
     loadingMessage.textContent = 'SnipeRank is analyzing. It may take up to a minute.';
 
     fetch(`/api/friendly?url=${encodeURIComponent(url)}`)
-      .then(res => res.json())
+      .then(async res => {
+        if (!res.ok) {
+          const text = await res.text();
+          throw new Error(text || `Request failed with ${res.status}`);
+        }
+        return res.json();
+      })
       .then(data => {
         console.log('Analysis result:', data);
         renderReport(data);
@@ -40,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadingMessage.classList.add('hidden');
     resultContainer.classList.remove('hidden');
 
-    document.getElementById('resultUrl').textContent = `Analyzed URL: ${data.url || 'N/A'}`;
+    document.getElementById('resultUrl').textContent = `Analyzed URL: ${data.url || currentURL}`;
     document.getElementById('scoreValue').textContent = data.score ?? 'N/A';
 
     const superpowersList = document.getElementById('superpowersList');
@@ -67,7 +73,6 @@ document.addEventListener('DOMContentLoaded', () => {
       aiInsightsList.appendChild(li);
     });
 
-    contactForm.classList.remove('hidden');
+    contactForm?.classList.remove('hidden');
   }
 });
-
