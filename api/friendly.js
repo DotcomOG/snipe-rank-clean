@@ -1,4 +1,3 @@
-# api/friendly.js
 import OpenAI from 'openai';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
@@ -7,12 +6,15 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 export default async function handler(req, res) {
   const { url } = req.query;
-  if (!url) return res.status(400).json({ error: 'URL parameter is required.' });
+
+  if (!url) {
+    return res.status(400).json({ error: 'URL parameter is required.' });
+  }
 
   try {
     const response = await axios.get(url);
     const $ = cheerio.load(response.data);
-    const bodyText = $('body').text().replace(/\s+/g, ' ').trim().slice(0, 5000);
+    const bodyText = $('body').text().replace(/\s+/g, ' ').trim().slice(0, 6000);
 
     const prompt = `
 You are an AI SEO expert. A user has submitted the following webpage content for analysis:
@@ -33,7 +35,7 @@ Your job is to:
    - DO NOT include solutions or suggestions — let the concern stand on its own
    - DO NOT include labels like “Issue:” or “Importance:”
 
-4. List 5 short AI Engine Insights — one line per engine (Gemini, ChatGPT, Copilot, Perplexity)
+4. List 5 short AI Engine Insights — one line per engine (Gemini, ChatGPT, Copilot, Perplexity, Claude)
 
 Return ONLY this JSON format:
 
@@ -51,22 +53,26 @@ No extra commentary. No markdown. Only valid JSON.
     const chat = await openai.chat.completions.create({
       model: 'gpt-3.5-turbo',
       temperature: 0.7,
-      messages: [{ role: 'user', content: prompt }],
+      messages: [{ role: 'user', content: prompt }]
     });
 
     const output = chat.choices[0].message.content;
+
+    console.log('OpenAI Raw Output:', output);
 
     try {
       const parsed = JSON.parse(output);
       parsed.url = url;
       return res.status(200).json(parsed);
     } catch (jsonErr) {
-      console.error('Failed to parse OpenAI output:', output);
+      console.error('❌ Failed to parse OpenAI output:', output);
       return res.status(500).json({ error: 'Invalid JSON from OpenAI', raw: output });
     }
   } catch (err) {
-    console.error('Error in /api/friendly:', err);
-    return res.status(500).json({ error: 'Failed to analyze URL', detail: err.message });
+    console.error('🔥 API Error [friendly]:', err.response?.data || err.message || err);
+    return res.status(500).json({
+      error: 'Failed to analyze URL',
+      detail: err.response?.data || err.message || err
+    });
   }
 }
-
