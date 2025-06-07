@@ -12,11 +12,24 @@ export default async function handler(req, res) {
   }
 
 try {
-  new URL(url); // throws if not a valid URL
+  new URL(url); // Throws if invalid
 } catch {
   return res.status(400).json({ error: 'Invalid URL format.' });
-    const response = await axios.get(url);
-    const $ = cheerio.load(response.data);
+}
+
+let html = '';
+try {
+  const response = await axios.get(url, { timeout: 8000 });
+  html = response.data;
+} catch (axiosErr) {
+  console.error('❌ axios failed to fetch URL:', axiosErr.message || axiosErr);
+  return res.status(500).json({
+    error: 'Failed to fetch content from the provided URL.',
+    detail: axiosErr.message || axiosErr
+  });
+}
+
+const $ = cheerio.load(html);
     const bodyText = $('body').text().replace(/\s+/g, ' ').trim().slice(0, 6000);
 
     const prompt = `
