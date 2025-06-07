@@ -11,7 +11,10 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'URL parameter is required.' });
   }
 
-  try {
+try {
+  new URL(url); // throws if not a valid URL
+} catch {
+  return res.status(400).json({ error: 'Invalid URL format.' });
     const response = await axios.get(url);
     const $ = cheerio.load(response.data);
     const bodyText = $('body').text().replace(/\s+/g, ' ').trim().slice(0, 6000);

@@ -16,31 +16,37 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  function handleAnalyze() {
-    const url = urlInput.value.trim();
-    if (!url) return alert('Please enter a valid URL.');
-    currentURL = url;
+function handleAnalyze() {
+  const url = urlInput.value.trim();
 
-    modal.classList.add('hidden');
-    loadingMessage.textContent = 'SnipeRank is analyzing. It may take up to a minute.';
-
-    fetch(`/api/friendly?url=${encodeURIComponent(url)}`)
-      .then(async res => {
-        if (!res.ok) {
-          const text = await res.text();
-          throw new Error(text || `Request failed with ${res.status}`);
-        }
-        return res.json();
-      })
-      .then(data => {
-        console.log('Analysis result:', data);
-        renderReport(data);
-      })
-      .catch(err => {
-        console.error('Error fetching analysis:', err);
-        loadingMessage.textContent = 'Something went wrong. Please try again.';
-      });
+  // Basic validation
+  try {
+    new URL(url);
+  } catch {
+    return alert('Please enter a valid URL including https://');
   }
+
+  currentURL = url;
+  modal.classList.add('hidden');
+  loadingMessage.textContent = 'SnipeRank is analyzing. It may take up to a minute.';
+
+  fetch(`/api/friendly?url=${encodeURIComponent(url)}`)
+    .then(async res => {
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(text || `Request failed with ${res.status}`);
+      }
+      return res.json();
+    })
+    .then(data => {
+      console.log('Analysis result:', data);
+      renderReport(data);
+    })
+    .catch(err => {
+      console.error('Error fetching analysis:', err);
+      loadingMessage.textContent = 'Something went wrong. Please try again.';
+    });
+}
 
   function renderReport(data) {
     loadingMessage.classList.add('hidden');
