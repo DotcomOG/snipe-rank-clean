@@ -66,13 +66,22 @@ Return ONLY this JSON format:
 No extra commentary. No markdown. Only valid JSON.
 `;
 
-    const chat = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo',
-      temperature: 0.7,
-      messages: [{ role: 'user', content: prompt }]
-    });
-
-    const output = chat.choices[0].message.content;
+let output = '';
+try {
+  const chat = await openai.chat.completions.create({
+    model: 'gpt-3.5-turbo',
+    temperature: 0.7,
+    messages: [{ role: 'user', content: prompt }]
+  });
+  output = chat.choices[0].message.content;
+  console.log('✅ OpenAI Raw Output:', output);
+} catch (openaiErr) {
+  console.error('❌ OpenAI call failed:', openaiErr.message || openaiErr);
+  return res.status(500).json({
+    error: 'OpenAI call failed',
+    detail: openaiErr.message || openaiErr
+  });
+}
 
     console.log('OpenAI Raw Output:', output);
 
@@ -91,4 +100,3 @@ No extra commentary. No markdown. Only valid JSON.
       detail: err.response?.data || err.message || err
     });
   }
-}
