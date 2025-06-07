@@ -1,3 +1,4 @@
+# api/friendly.js
 import OpenAI from 'openai';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
@@ -48,7 +49,7 @@ No extra commentary. No markdown. Only valid JSON.
 `;
 
     const chat = await openai.chat.completions.create({
-      model: 'gpt-4',
+      model: 'gpt-3.5-turbo',
       temperature: 0.7,
       messages: [{ role: 'user', content: prompt }],
     });
@@ -68,3 +69,4 @@ No extra commentary. No markdown. Only valid JSON.
     return res.status(500).json({ error: 'Failed to analyze URL', detail: err.message });
   }
 }
+

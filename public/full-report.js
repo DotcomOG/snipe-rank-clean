@@ -1,35 +1,23 @@
+# public/full-report.js
+// full-report.js — Last updated: 2025-06-02 19:25 ET
+
 document.addEventListener('DOMContentLoaded', () => {
-  const params = new URLSearchParams(window.location.search);
-  const url = params.get('url');
-  const name = params.get('name');
-  const email = params.get('email');
-
-  const reportContent = document.getElementById('reportContent');
-  const loadingMessage = document.getElementById('loadingMessage');
-
+  const url = new URLSearchParams(window.location.search).get('url');
   const resultUrl = document.getElementById('fullResultUrl');
   const scoreEl = document.getElementById('fullScore');
   const superpowersList = document.getElementById('fullSuperpowers');
   const opportunitiesList = document.getElementById('fullOpportunities');
   const insightsList = document.getElementById('fullInsights');
-
-  const nameInput = document.getElementById('followupName');
-  const emailInput = document.getElementById('followupEmail');
-
-  if (nameInput) nameInput.value = name || '';
-  if (emailInput) emailInput.value = email || '';
+  const contactForm = document.getElementById('fullContactForm');
 
   if (!url) {
-    loadingMessage.textContent = 'Error: No URL provided.';
+    resultUrl.textContent = 'No URL provided.';
     return;
   }
 
   fetch(`/api/full?url=${encodeURIComponent(url)}`)
     .then(res => res.json())
     .then(data => {
-      loadingMessage.classList.add('hidden');
-      reportContent.classList.remove('hidden');
-
       resultUrl.textContent = `Analyzed URL: ${data.url || url}`;
       scoreEl.textContent = `Overall Score: ${data.score ?? 'N/A'}/100`;
 
@@ -53,9 +41,11 @@ document.addEventListener('DOMContentLoaded', () => {
         li.textContent = item;
         insightsList.appendChild(li);
       });
+
+      contactForm.classList.remove('hidden');
     })
     .catch(err => {
-      console.error('Error fetching full report:', err);
-      loadingMessage.textContent = 'There was a problem retrieving the full report.';
+      console.error('Failed to load full report:', err);
+      resultUrl.textContent = 'Error fetching report. Please try again.';
     });
 });

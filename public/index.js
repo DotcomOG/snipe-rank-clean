@@ -1,3 +1,4 @@
+# public/index.js
 // index.js — Last updated: 2025-06-02 19:25 ET
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -24,13 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadingMessage.textContent = 'SnipeRank is analyzing. It may take up to a minute.';
 
     fetch(`/api/friendly?url=${encodeURIComponent(url)}`)
-      .then(async res => {
-        if (!res.ok) {
-          const text = await res.text();
-          throw new Error(text || `Request failed with ${res.status}`);
-        }
-        return res.json();
-      })
+      .then(res => res.json())
       .then(data => {
         console.log('Analysis result:', data);
         renderReport(data);
