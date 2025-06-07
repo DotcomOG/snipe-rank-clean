@@ -11,28 +11,30 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'URL parameter is required.' });
   }
 
-try {
-  new URL(url); // Throws if invalid
-} catch {
-  return res.status(400).json({ error: 'Invalid URL format.' });
-}
+  // Validate URL format
+  try {
+    new URL(url);
+  } catch (err) {
+    return res.status(400).json({ error: 'Invalid URL format.' });
+  }
 
-let html = '';
-try {
-  const response = await axios.get(url, { timeout: 8000 });
-  html = response.data;
-} catch (axiosErr) {
-  console.error('❌ axios failed to fetch URL:', axiosErr.message || axiosErr);
-  return res.status(500).json({
-    error: 'Failed to fetch content from the provided URL.',
-    detail: axiosErr.message || axiosErr
-  });
-}
+  let html = '';
 
-const $ = cheerio.load(html);
-    const bodyText = $('body').text().replace(/\s+/g, ' ').trim().slice(0, 6000);
+  try {
+    const response = await axios.get(url, { timeout: 8000 });
+    html = response.data;
+  } catch (axiosErr) {
+    console.error('❌ axios failed to fetch URL:', axiosErr.message || axiosErr);
+    return res.status(500).json({
+      error: 'Failed to fetch content from the provided URL.',
+      detail: axiosErr.message || axiosErr
+    });
+  }
 
-    const prompt = `
+  const $ = cheerio.load(html);
+  const bodyText = $('body').text().replace(/\s+/g, ' ').trim().slice(0, 6000);
+
+  const prompt = `
 You are an AI SEO expert. A user has submitted the following webpage content for analysis:
 
 "${bodyText}"
@@ -66,37 +68,31 @@ Return ONLY this JSON format:
 No extra commentary. No markdown. Only valid JSON.
 `;
 
-let output = '';
-try {
-  const chat = await openai.chat.completions.create({
-    model: 'gpt-3.5-turbo',
-    temperature: 0.7,
-    messages: [{ role: 'user', content: prompt }]
-  });
-  output = chat.choices[0].message.content;
-  console.log('✅ OpenAI Raw Output:', output);
-} catch (openaiErr) {
-  console.error('❌ OpenAI call failed:', openaiErr.message || openaiErr);
-  return res.status(500).json({
-    error: 'OpenAI call failed',
-    detail: openaiErr.message || openaiErr
-  });
-}
+  let output = '';
 
-    console.log('OpenAI Raw Output:', output);
+  try {
+    const chat = await openai.chat.completions.create({
+      model: 'gpt-3.5-turbo',
+      temperature: 0.7,
+      messages: [{ role: 'user', content: prompt }]
+    });
 
-    try {
-      const parsed = JSON.parse(output);
-      parsed.url = url;
-      return res.status(200).json(parsed);
-    } catch (jsonErr) {
-      console.error('❌ Failed to parse OpenAI output:', output);
-      return res.status(500).json({ error: 'Invalid JSON from OpenAI', raw: output });
-    }
-  } catch (err) {
-    console.error('🔥 API Error [friendly]:', err.response?.data || err.message || err);
+    output = chat.choices[0].message.content;
+    console.log('✅ OpenAI Output:', output);
+  } catch (openaiErr) {
+    console.error('❌ OpenAI request failed:', openaiErr.message || openaiErr);
     return res.status(500).json({
-      error: 'Failed to analyze URL',
-      detail: err.response?.data || err.message || err
+      error: 'OpenAI call failed',
+      detail: openaiErr.message || openaiErr
     });
   }
+
+  try {
+    const parsed = JSON.parse(output);
+    parsed.url = url;
+    return res.status(200).json(parsed);
+  } catch (parseErr) {
+    console.error('❌ Failed to parse OpenAI output:', output);
+    return res.status(500).json({ error: 'Invalid JSON from OpenAI', raw: output });
+  }
+}
