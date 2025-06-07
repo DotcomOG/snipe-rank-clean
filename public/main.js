@@ -1,5 +1,5 @@
 // public/index.js — Controls lightbox, fetch, and summary render
-
+console.log('✅ JS Loaded');
 document.addEventListener('DOMContentLoaded', () => {
   const modal = document.getElementById('urlInputModal');
   const urlInput = document.getElementById('urlInput');
