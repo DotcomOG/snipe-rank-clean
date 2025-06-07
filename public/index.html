@@ -1,17 +1,17 @@
-<!-- index.html — Last updated: 2025-06-02 19:25 ET -->
+<!-- public/index.html — AI SEO Summary Page -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>SnipeRank – AI SEO Analyzer</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.5/dist/tailwind.min.css">
 </head>
 <body class="bg-white text-black font-sans">
 
   <!-- Header -->
   <header class="text-center py-8">
-    <h1 class="text-4xl font-bold">SnipeRank: AI SEO Analyzer</h1>
+    <h1 class="text-4xl font-bold">🤖 SnipeRank<br/>AI SEO Analyzer 🤖</h1>
   </header>
 
   <!-- Lightbox URL Entry -->
@@ -23,12 +23,12 @@
     </div>
   </div>
 
-  <!-- Loading Message -->
+  <!-- Loading -->
   <div id="loadingMessage" class="text-center mt-10 text-lg">
     SnipeRank is analyzing. It may take up to a minute.
   </div>
 
-  <!-- Result Container -->
+  <!-- Results -->
   <div id="resultContainer" class="hidden px-6 py-8 max-w-4xl mx-auto space-y-6">
 
     <div id="resultUrl" class="text-xl font-semibold text-center"></div>
@@ -39,27 +39,25 @@
 
     <div>
       <h2 class="text-xl font-bold mt-8 mb-2">5 AI Superpowers</h2>
-      <ul id="superpowersList" class="list-disc list-inside space-y-2"></ul>
+      <ul id="superpowersList" class="list-none space-y-2 text-left"></ul>
     </div>
 
     <div>
       <h2 class="text-xl font-bold mt-8 mb-2">10 AI SEO Opportunities</h2>
-      <ul id="opportunitiesList" class="list-disc list-inside space-y-2"></ul>
+      <ul id="opportunitiesList" class="list-none space-y-2 text-left"></ul>
     </div>
 
     <div>
       <h2 class="text-xl font-bold mt-8 mb-2">AI Engine Insights</h2>
-      <ul id="aiInsightsList" class="list-disc list-inside space-y-2"></ul>
+      <ul id="aiInsightsList" class="list-none space-y-2 text-left"></ul>
     </div>
 
     <div id="contactForm" class="hidden mt-12 border-t border-gray-300 pt-8">
-      <h3 class="text-2xl font-semibold mb-4">Request a Free AI SEO Consultation</h3>
-      <form class="space-y-4">
-        <input type="text" placeholder="Name" class="w-full p-2 rounded border text-black" />
-        <input type="email" placeholder="Email" class="w-full p-2 rounded border text-black" />
-        <input type="tel" placeholder="Phone (optional)" class="w-full p-2 rounded border text-black" />
-        <textarea placeholder="Your message" class="w-full p-2 rounded border text-black h-32"></textarea>
-        <button type="submit" class="bg-black text-white px-4 py-2 rounded hover:bg-gray-800">Send</button>
+      <h3 class="text-2xl font-semibold mb-4">Want to dig deeper? Get the full report</h3>
+      <form id="summaryForm" class="space-y-4">
+        <input id="summaryName" type="text" placeholder="Name" required class="w-full p-2 rounded border text-black" />
+        <input id="summaryEmail" type="email" placeholder="Email address" required class="w-full p-2 rounded border text-black" />
+        <button type="submit" class="bg-black text-white px-4 py-2 rounded hover:bg-gray-800">Full Report</button>
       </form>
     </div>
 

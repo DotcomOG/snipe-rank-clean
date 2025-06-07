@@ -1,4 +1,6 @@
-# api/full.js
+// =========================
+// ✅ api/full.js
+// =========================
 import OpenAI from 'openai';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
@@ -7,66 +9,52 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 export default async function handler(req, res) {
   const { url } = req.query;
-  if (!url) return res.status(400).json({ error: 'URL parameter is required.' });
+  if (!url) return res.status(400).json({ error: 'URL is required.' });
 
-  try {
-    const response = await axios.get(url);
-    const $ = cheerio.load(response.data);
+  const run = async () => {
+    try {
+      new URL(url);
+    } catch {
+      return res.status(400).json({ error: 'Invalid URL format.' });
+    }
+
+    let html = '';
+    try {
+      const response = await axios.get(url, { timeout: 8000 });
+      html = response.data;
+    } catch (err) {
+      console.error('❌ axios error (full):', err.message);
+      return res.status(500).json({ error: 'Failed to fetch content.', detail: err.message });
+    }
+
+    const $ = cheerio.load(html);
     const bodyText = $('body').text().replace(/\s+/g, ' ').trim().slice(0, 7000);
 
-    const prompt = `
-You are an AI SEO expert. A user has submitted the following webpage content for in-depth analysis:
+    const prompt = `You are an AI SEO expert. Analyze this content deeply: \n\n\"${bodyText}\" \n\nReturn JSON with score (1-100), 5 detailed superpowers (3–5 sentences each), 10 detailed opportunities (5–6 sentences each), and 5 AI engine insights (1 per line: Gemini, ChatGPT, Claude, Copilot, Perplexity).`;
 
-"${bodyText}"
-
-Your job is to generate a **detailed AI SEO report**. Please provide:
-
-1. An overall AI SEO score (1–100)
-
-2. 5 AI SEO Superpowers
-   - Each superpower should be 2–4 full sentences
-   - Describe how it helps visibility, indexing, authority, or AI search trust
-
-3. 10 AI SEO Opportunities
-   - Each item should be a full paragraph (at least 3–5 sentences)
-   - Use persuasive, plain English
-   - Focus on impact and risks — do not include any “how to fix” instructions
-   - Do not label sections with "issue", "importance", or "solution"
-
-4. 5 one-line AI Engine Insights for Gemini, ChatGPT, Copilot, and Perplexity
-
-Return ONLY this JSON format:
-
-{
-  "url": "Submitted URL",
-  "score": 87,
-  "superpowers": ["..."],
-  "opportunities": ["..."],
-  "insights": ["..."]
-}
-
-Do not include markdown, commentary, explanations, or formatting outside the JSON.
-`;
-
-    const chat = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo',
-      temperature: 0.7,
-      messages: [{ role: 'user', content: prompt }],
-    });
-
-    const output = chat.choices[0].message.content;
+    let output = '';
+    try {
+      const chat = await openai.chat.completions.create({
+        model: 'gpt-3.5-turbo',
+        temperature: 0.7,
+        messages: [{ role: 'user', content: prompt }]
+      });
+      output = chat.choices[0].message.content;
+      console.log('✅ OpenAI Output (full):', output);
+    } catch (err) {
+      console.error('❌ OpenAI full.js error:', err.message);
+      return res.status(500).json({ error: 'OpenAI request failed.', detail: err.message });
+    }
 
     try {
       const parsed = JSON.parse(output);
       parsed.url = url;
       return res.status(200).json(parsed);
-    } catch (jsonErr) {
-      console.error('Failed to parse OpenAI output:', output);
+    } catch (err) {
+      console.error('❌ Failed to parse OpenAI output:', output);
       return res.status(500).json({ error: 'Invalid JSON from OpenAI', raw: output });
     }
-  } catch (err) {
-    console.error('Error in /api/full:', err);
-    return res.status(500).json({ error: 'Failed to analyze URL', detail: err.message });
-  }
-}
+  };
 
+  return run();
+}

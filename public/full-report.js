@@ -1,51 +1,60 @@
-# public/full-report.js
-// full-report.js — Last updated: 2025-06-02 19:25 ET
+// public/full-report.js — Loads full analysis from /api/full
 
 document.addEventListener('DOMContentLoaded', () => {
-  const url = new URLSearchParams(window.location.search).get('url');
-  const resultUrl = document.getElementById('fullResultUrl');
-  const scoreEl = document.getElementById('fullScore');
-  const superpowersList = document.getElementById('fullSuperpowers');
-  const opportunitiesList = document.getElementById('fullOpportunities');
-  const insightsList = document.getElementById('fullInsights');
-  const contactForm = document.getElementById('fullContactForm');
+  const params = new URLSearchParams(window.location.search);
+  const url = params.get('url');
+  const name = params.get('name');
+  const email = params.get('email');
+
+  const reportContent = document.getElementById('reportContent');
+  const loadingMessage = document.getElementById('loadingMessage');
+  const nameInput = document.getElementById('followupName');
+  const emailInput = document.getElementById('followupEmail');
+
+  if (nameInput) nameInput.value = name || '';
+  if (emailInput) emailInput.value = email || '';
 
   if (!url) {
-    resultUrl.textContent = 'No URL provided.';
+    loadingMessage.textContent = 'Error: No URL provided.';
     return;
   }
 
   fetch(`/api/full?url=${encodeURIComponent(url)}`)
     .then(res => res.json())
     .then(data => {
-      resultUrl.textContent = `Analyzed URL: ${data.url || url}`;
-      scoreEl.textContent = `Overall Score: ${data.score ?? 'N/A'}/100`;
+      loadingMessage.classList.add('hidden');
+      reportContent.classList.remove('hidden');
 
-      superpowersList.innerHTML = '';
+      document.getElementById('fullResultUrl').textContent = `Analyzed URL: ${data.url || url}`;
+      document.getElementById('fullScore').textContent = `Overall Score: ${data.score ?? 'N/A'}/100`;
+
+      const superpowers = document.getElementById('fullSuperpowers');
+      const opportunities = document.getElementById('fullOpportunities');
+      const insights = document.getElementById('fullInsights');
+
+      superpowers.innerHTML = '';
       (data.superpowers || []).forEach(item => {
         const li = document.createElement('li');
-        li.textContent = item;
-        superpowersList.appendChild(li);
+        li.textContent = `✅ ${item}`;
+        superpowers.appendChild(li);
       });
 
-      opportunitiesList.innerHTML = '';
+      opportunities.innerHTML = '';
       (data.opportunities || []).forEach(item => {
         const li = document.createElement('li');
-        li.textContent = item;
-        opportunitiesList.appendChild(li);
+        li.textContent = `🚨 ${item}`;
+        opportunities.appendChild(li);
       });
 
-      insightsList.innerHTML = '';
+      insights.innerHTML = '';
       (data.insights || []).forEach(item => {
         const li = document.createElement('li');
         li.textContent = item;
-        insightsList.appendChild(li);
+        insights.appendChild(li);
       });
-
-      contactForm.classList.remove('hidden');
     })
     .catch(err => {
-      console.error('Failed to load full report:', err);
-      resultUrl.textContent = 'Error fetching report. Please try again.';
+      console.error('Error fetching full report:', err);
+      loadingMessage.textContent = 'Failed to load full report.';
     });
 });
