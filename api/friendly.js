@@ -1,4 +1,5 @@
 // api/friendly.js — Last updated: 2025-06-07 17:41 ET
+// @vercel/node@20
 
 import OpenAI from 'openai';
 import axios from 'axios';

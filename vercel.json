@@ -1,5 +1,3 @@
-// @vercel/node@20
-
 {
   "version": 2,
   "routes": [

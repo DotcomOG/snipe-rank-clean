@@ -1,5 +1,6 @@
 // =========================
 // ✅ api/full.js
+// @vercel/node@20
 // =========================
 import OpenAI from 'openai';
 import axios from 'axios';
