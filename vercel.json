@@ -1,10 +1,7 @@
+// @vercel/node@20
+
 {
   "version": 2,
-  "functions": {
-    "api/**/*.js": {
-      "runtime": "nodejs@20"
-    }
-  },
   "routes": [
     { "src": "/api/(.*)", "dest": "/api/$1.js" },
     { "src": "/full-report", "dest": "/public/full-report.html" },
