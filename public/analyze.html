@@ -1,56 +1,128 @@
-<!-- public/analyze.html — Displays dynamic results -->
+<!-- analyze.html — Last updated 2025-06-10 @ 12:05 PM ET -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AI SEO Report – SnipeRank</title>
-  <link rel="stylesheet" href="/style.css" />
+  <title>AI SEO Analysis</title>
+  <style>
+    body {
+      font-family: Helvetica, sans-serif;
+      margin: 0;
+      padding: 2rem;
+      background-color: white;
+      color: black;
+    }
+    h1, h2, h3 {
+      text-align: center;
+    }
+    ul {
+      list-style-type: none;
+      padding-left: 0;
+    }
+    li {
+      margin-bottom: 1rem;
+    }
+    .section {
+      margin-bottom: 3rem;
+    }
+    .loading {
+      text-align: center;
+      font-size: 1.2rem;
+    }
+  </style>
 </head>
-<body class="bg-white text-black font-sans px-6 py-8 max-w-4xl mx-auto">
+<body>
+  <h1>🤖 SnipeRank</h1>
+  <h2>AI SEO Analyzer 🤖</h2>
 
-  <header class="text-center mb-8">
-    <h1 class="text-4xl font-bold">SnipeRank: AI SEO Report</h1>
-  </header>
+  <div id="loading" class="loading">SnipeRank is analyzing. It may take up to a minute...</div>
+  <div id="results" style="display: none;">
 
-  <div id="loadingMessage" class="text-center text-lg">
-    Analyzing... Please wait.
-  </div>
-
-  <div id="resultContainer" class="hidden space-y-6">
-
-    <div id="resultUrl" class="text-xl font-semibold text-center"></div>
-
-    <div id="scoreSection" class="text-center">
-      <p class="text-2xl font-bold">Overall Score: <span id="scoreValue"></span>/100</p>
+    <div class="section">
+      <h3>🔗 URL</h3>
+      <p id="page-url"></p>
     </div>
 
-    <section>
-      <h2 class="text-xl font-bold mt-8 mb-2">5 AI Superpowers</h2>
-      <ul id="superpowersList" class="list-none space-y-2 text-left"></ul>
-    </section>
+    <div class="section">
+      <h3>📊 Overall Score</h3>
+      <p id="overall-score"></p>
+    </div>
 
-    <section>
-      <h2 class="text-xl font-bold mt-8 mb-2">10 AI SEO Opportunities</h2>
-      <ul id="opportunitiesList" class="list-none space-y-2 text-left"></ul>
-    </section>
+    <div class="section">
+      <h3>✅ What's Working</h3>
+      <ul id="ai-strengths"></ul>
+    </div>
 
-    <section>
-      <h2 class="text-xl font-bold mt-8 mb-2">AI Engine Insights</h2>
-      <ul id="aiInsightsList" class="list-none space-y-2 text-left"></ul>
-    </section>
+    <div class="section">
+      <h3>🚨 What Needs Attention</h3>
+      <ul id="ai-opportunities"></ul>
+    </div>
 
-    <section id="contactForm" class="hidden mt-12 border-t border-gray-300 pt-8">
-      <h3 class="text-2xl font-semibold mb-4">Want to dig deeper? Request a full report</h3>
-      <form id="summaryForm" class="space-y-4">
-        <input id="summaryName" type="text" placeholder="Name" required class="w-full p-2 rounded border text-black" />
-        <input id="summaryEmail" type="email" placeholder="Email address" required class="w-full p-2 rounded border text-black" />
-        <button type="submit" class="bg-black text-white px-4 py-2 rounded hover:bg-gray-800">Get Full Report</button>
-      </form>
-    </section>
-
+    <div class="section">
+      <h3>🧠 AI Engine Insights</h3>
+      <ul id="ai-insights"></ul>
+    </div>
   </div>
 
-  <script src="/analyze.js"></script>
+  <script>
+    async function runAnalysis() {
+      const params = new URLSearchParams(window.location.search);
+      const url = params.get("url");
+
+      if (!url) {
+        document.getElementById("loading").textContent = "No URL provided.";
+        return;
+      }
+
+      document.getElementById("page-url").textContent = decodeURIComponent(url);
+
+      try {
+        const res = await fetch(`https://ai-seo-backend-final.onrender.com/friendly?url=${encodeURIComponent(url)}`);
+        const data = await res.json();
+
+        if (!data.success) {
+          document.getElementById("loading").textContent = "Analysis failed. Please try again.";
+          return;
+        }
+
+        document.getElementById("overall-score").textContent = data.score;
+
+        const strengths = data.ai_strengths || [];
+        const opportunities = data.ai_opportunities || [];
+        const insights = data.engine_insights || [];
+
+        const strengthsList = document.getElementById("ai-strengths");
+        strengths.forEach(item => {
+          const li = document.createElement("li");
+          li.textContent = `✅ ${item}`;
+          strengthsList.appendChild(li);
+        });
+
+        const opportunitiesList = document.getElementById("ai-opportunities");
+        opportunities.forEach(item => {
+          const li = document.createElement("li");
+          li.textContent = `🚨 ${item}`;
+          opportunitiesList.appendChild(li);
+        });
+
+        const insightsList = document.getElementById("ai-insights");
+        insights.forEach(insight => {
+          const li = document.createElement("li");
+          li.textContent = insight;
+          insightsList.appendChild(li);
+        });
+
+        document.getElementById("loading").style.display = "none";
+        document.getElementById("results").style.display = "block";
+
+      } catch (err) {
+        console.error(err);
+        document.getElementById("loading").textContent = "Error fetching analysis.";
+      }
+    }
+
+    runAnalysis();
+  </script>
 </body>
 </html>

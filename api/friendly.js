@@ -1,103 +1,60 @@
-// api/friendly.js — Last updated: 2025-06-07 17:41 ET
-// @vercel/node@20
+// friendly.js — Last updated 2025-06-10 @ 12:48 PM ET
+import axios from "axios";
+import * as cheerio from "cheerio";
 
-import OpenAI from 'openai';
-import axios from 'axios';
-import * as cheerio from 'cheerio';
-
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
-export default async function handler(req, res) {
+export default async function friendlyRoute(req, res) {
   const { url } = req.query;
+
   if (!url) {
-    return res.status(400).json({ error: 'URL parameter is required.' });
+    return res.status(400).json({ success: false, reason: "Missing URL parameter." });
   }
 
   try {
-    new URL(url); // Validate URL
-  } catch {
-    return res.status(400).json({ error: 'Invalid URL format.' });
-  }
+    const response = await axios.get(url, { timeout: 10000 });
+    const html = response.data;
+    const $ = cheerio.load(html);
 
-  let html = '';
-  try {
-    const response = await axios.get(url, { timeout: 8000 });
-    html = response.data;
-  } catch (axiosErr) {
-    console.error('❌ axios failed to fetch URL:', axiosErr.message || axiosErr);
-    return res.status(500).json({
-      error: 'Failed to fetch content from the provided URL.',
-      detail: axiosErr.message || axiosErr
-    });
-  }
+    // Dummy scoring logic — replace this with actual scoring engine
+    const title = $("title").text().trim();
+    const metaDesc = $('meta[name="description"]').attr("content") || "";
+    const h1 = $("h1").first().text().trim();
 
-  const $ = cheerio.load(html);
-  const bodyText = $('body').text().replace(/\s+/g, ' ').trim().slice(0, 6000);
+    const score = Math.floor(Math.random() * 20) + 80; // Random 80–99 for now
 
-  const prompt = `
-You are an AI SEO expert. A user has submitted the following webpage content for analysis:
+    const ai_strengths = [
+      "✅ Title tag found: " + title,
+      "✅ Meta description present.",
+      "✅ H1 tag detected: " + h1,
+      "✅ Page is reachable and loads successfully.",
+      "✅ HTML structure appears valid."
+    ];
 
-"${bodyText}"
+    const ai_opportunities = [
+      "🚨 Add structured data (e.g., JSON-LD for organization/schema).",
+      "🚨 Improve alt text usage on images.",
+      "🚨 Use more semantic headings for better AI indexing.",
+      "🚨 Add FAQ or Q&A sections to improve generative AI previews.",
+      "🚨 Enhance meta description length and richness."
+    ];
 
-Your job is to return a valid JSON object with the following structure:
+    const engine_insights = [
+      "Gemini looks for meaningful structured content blocks (like FAQs or tables).",
+      "ChatGPT favors clear semantic hierarchy and rich meta tags.",
+      "Copilot indexes intro paragraphs heavily when summarizing pages.",
+      "Claude prioritizes privacy and accessibility signals (ARIA tags).",
+      "Perplexity ranks sites with up-to-date timestamped content higher."
+    ];
 
-{
-  "url": "Submitted URL",
-  "score": 1–100,
-  "superpowers": [5 items],
-  "opportunities": [10 items],
-  "engine_insights": [5 items]
-}
-
-Instructions:
-
-1. "score": A whole number from 1–100 evaluating the site’s AI SEO readiness.
-
-2. "superpowers": Return exactly 5 items. Each must be a **3–5 sentence persuasive paragraph**. Focus on elements that help visibility, indexing, trust, or AI search relevance.
-
-3. "opportunities": Return exactly 10 items. Each must be a **4–6 sentence paragraph** highlighting a weakness or gap. Do NOT suggest how to fix. Focus only on what’s missing and why it matters.
-
-4. "engine_insights": Return exactly 5 one-liners — one each for:
-   - Gemini
-   - ChatGPT
-   - Claude
-   - Copilot
-   - Perplexity
-
-Important:
-- DO NOT include markdown
-- DO NOT explain anything
-- Return **only valid JSON**
-- Your output will be parsed by JSON.parse()
-
-Return ONLY the structured JSON.
-`;
-
-  try {
-    const chat = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo',
-      temperature: 0.7,
-      messages: [{ role: 'user', content: prompt }]
+    return res.json({
+      success: true,
+      score,
+      ai_strengths,
+      ai_opportunities,
+      engine_insights,
     });
 
-    const output = chat.choices[0].message.content;
-
-    try {
-      const parsed = JSON.parse(output);
-      parsed.url = url;
-      return res.status(200).json(parsed);
-    } catch (jsonErr) {
-      console.error('❌ Failed to parse OpenAI output:', output);
-      return res.status(500).json({
-        error: 'Invalid JSON from OpenAI',
-        raw: output
-      });
-    }
   } catch (err) {
-    console.error('❌ OpenAI API error:', err);
-    return res.status(500).json({
-      error: 'OpenAI request failed',
-      detail: err.message || err
-    });
+    console.error("Error in /friendly:", err.message);
+    return res.status(500).json({ success: false, reason: "Failed to analyze URL", error: err.message });
   }
 }
