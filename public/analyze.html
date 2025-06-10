@@ -1,4 +1,4 @@
-<!-- analyze.html — Updated 2025-06-10 @ 1:30 PM ET -->
+<!-- analyze.html — Updated 2025-06-10 @ 2:00 PM ET -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,21 +16,42 @@
     h1, h2, h3 {
       text-align: center;
     }
+    .section {
+      margin-bottom: 3rem;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+    }
     ul {
       list-style-type: none;
       padding-left: 0;
     }
     li {
-      margin-bottom: 1rem;
-      line-height: 1.5;
+      margin-bottom: 1.5rem;
+      line-height: 1.6;
       font-size: 1rem;
     }
-    .section {
-      margin-bottom: 3rem;
-    }
-    .loading {
+    .centered {
       text-align: center;
-      font-size: 1.2rem;
+    }
+    input, textarea {
+      display: block;
+      width: 100%;
+      padding: 0.5rem;
+      margin-top: 0.5rem;
+      margin-bottom: 1rem;
+      font-size: 1rem;
+    }
+    button {
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      background-color: black;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #333;
     }
   </style>
 </head>
@@ -38,26 +59,27 @@
   <h1>🤖 SnipeRank</h1>
   <h2>AI SEO Analyzer 🤖</h2>
 
-  <div id="loading" class="loading">SnipeRank is analyzing. It may take up to a minute...</div>
+  <div id="loading" class="centered">SnipeRank is analyzing. It may take up to a minute...</div>
+
   <div id="results" style="display: none;">
 
-    <div class="section">
-      <h3>🔗 URL</h3>
-      <p id="page-url"></p>
+    <div class="section centered">
+      <h3>🔗 Tested URL</h3>
+      <p id="page-url" style="font-weight: bold;"></p>
     </div>
 
-    <div class="section">
+    <div class="section centered">
       <h3>📊 Overall Score</h3>
-      <p id="overall-score"></p>
+      <p id="overall-score" style="font-size: 2rem; font-weight: bold;"></p>
     </div>
 
     <div class="section">
-      <h3>✅ What's Working</h3>
+      <h3>✅ What’s Working</h3>
       <ul id="ai-strengths"></ul>
     </div>
 
     <div class="section">
-      <h3>🚨 What Needs Attention</h3>
+      <h3>🚨 Needs Attention</h3>
       <ul id="ai-opportunities"></ul>
     </div>
 
@@ -65,12 +87,25 @@
       <h3>🧠 AI Engine Insights</h3>
       <ul id="ai-insights"></ul>
     </div>
+
+    <div class="section">
+      <h3 class="centered">📩 Request Your Full Report</h3>
+      <form id="contact-form" class="centered" method="POST" action="https://formspree.io/f/mayzkzed">
+        <input type="text" id="name" name="name" placeholder="Your Full Name" required>
+        <input type="email" id="email" name="email" placeholder="Your Email Address" required>
+        <input type="text" name="phone" placeholder="Your Phone Number (Optional)">
+        <input type="text" name="company" placeholder="Company / Organization (Optional)">
+        <button type="submit">Get Full Report</button>
+      </form>
+    </div>
   </div>
 
   <script>
     async function runAnalysis() {
       const params = new URLSearchParams(window.location.search);
       const url = params.get("url");
+      const name = params.get("name") || "";
+      const email = params.get("email") || "";
 
       if (!url) {
         document.getElementById("loading").textContent = "No URL provided.";
@@ -78,6 +113,8 @@
       }
 
       document.getElementById("page-url").textContent = decodeURIComponent(url);
+      document.getElementById("name").value = decodeURIComponent(name);
+      document.getElementById("email").value = decodeURIComponent(email);
 
       try {
         const res = await fetch(`https://snipe-rank-clean.onrender.com/friendly?url=${encodeURIComponent(url)}`);
