@@ -1,69 +1,42 @@
-<!-- public/index.html — AI SEO Summary Page -->
+<!-- public/index.html — Final Clean Landing Page -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>SnipeRank – AI SEO Analyzer</title>
-<link href="/style.css" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css" />
 </head>
-<body class="bg-white text-black font-sans">
+<body class="bg-white text-black font-sans flex items-center justify-center min-h-screen px-4">
 
-  <!-- Header -->
-  <header class="text-center py-8">
-    <h1 class="text-4xl font-bold">🤖 SnipeRank<br/>AI SEO Analyzer 🤖</h1>
-  </header>
+  <div class="w-full max-w-xl bg-white p-8 rounded-xl shadow-md border border-gray-200 space-y-6 text-center">
+    <h1 class="text-4xl font-bold mb-4">🤖 SnipeRank<br/>AI SEO Analyzer 🤖</h1>
 
-  <!-- Lightbox URL Entry -->
-  <div id="urlInputModal" class="fixed inset-0 bg-black bg-opacity-95 flex items-center justify-center z-50">
-    <div class="bg-white text-black rounded-2xl p-6 w-full max-w-md shadow-xl">
-      <h2 class="text-xl font-semibold mb-4 text-center">Enter a URL to Analyze</h2>
-      <input id="urlInput" type="text" placeholder="https://example.com" class="w-full p-3 rounded border border-gray-400 mb-4" />
-      <button id="submitBtn" class="w-full bg-black text-white py-2 px-4 rounded hover:bg-gray-900">Analyze</button>
-    </div>
+    <p class="text-gray-700 text-lg mb-4">
+      Instantly score any webpage for AI SEO readiness.
+    </p>
+
+    <input id="urlInput" type="text" placeholder="https://example.com"
+      class="w-full p-3 rounded border border-gray-300 text-black" />
+
+    <button id="submitBtn"
+      class="w-full bg-black text-white py-2 px-4 rounded hover:bg-gray-800">Analyze</button>
+
+    <p class="text-sm text-gray-400 mt-2">Results open on next screen</p>
   </div>
 
-  <!-- Loading -->
-  <div id="loadingMessage" class="text-center mt-10 text-lg">
-    SnipeRank is analyzing. It may take up to a minute.
-  </div>
-
-  <!-- Results -->
-  <div id="resultContainer" class="hidden px-6 py-8 max-w-4xl mx-auto space-y-6">
-
-    <div id="resultUrl" class="text-xl font-semibold text-center"></div>
-
-    <div id="scoreSection" class="text-center">
-      <p class="text-2xl font-bold">Overall Score: <span id="scoreValue"></span>/100</p>
-    </div>
-
-    <div>
-      <h2 class="text-xl font-bold mt-8 mb-2">5 AI Superpowers</h2>
-      <ul id="superpowersList" class="list-none space-y-2 text-left"></ul>
-    </div>
-
-    <div>
-      <h2 class="text-xl font-bold mt-8 mb-2">10 AI SEO Opportunities</h2>
-      <ul id="opportunitiesList" class="list-none space-y-2 text-left"></ul>
-    </div>
-
-    <div>
-      <h2 class="text-xl font-bold mt-8 mb-2">AI Engine Insights</h2>
-      <ul id="aiInsightsList" class="list-none space-y-2 text-left"></ul>
-    </div>
-
-    <div id="contactForm" class="hidden mt-12 border-t border-gray-300 pt-8">
-      <h3 class="text-2xl font-semibold mb-4">Want to dig deeper? Get the full report</h3>
-      <form id="summaryForm" class="space-y-4">
-        <input id="summaryName" type="text" placeholder="Name" required class="w-full p-2 rounded border text-black" />
-        <input id="summaryEmail" type="email" placeholder="Email address" required class="w-full p-2 rounded border text-black" />
-        <button type="submit" class="bg-black text-white px-4 py-2 rounded hover:bg-gray-800">Full Report</button>
-      </form>
-    </div>
-
-  </div>
-
-  <script src="/script.js" type="text/javascript" defer></script>
- 
+  <script>
+    console.log("✅ index.js inline script loaded");
+    document.getElementById('submitBtn').onclick = function () {
+      const url = document.getElementById('urlInput').value.trim();
+      try {
+        new URL(url);
+      } catch {
+        alert('Please enter a valid URL (starting with https://)');
+        return;
+      }
+      window.location.href = `/analyze.html?url=${encodeURIComponent(url)}`;
+    };
+  </script>
 </body>
 </html>
