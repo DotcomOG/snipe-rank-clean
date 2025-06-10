@@ -1,4 +1,4 @@
-<!-- analyze.html — Last updated 2025-06-10 @ 12:05 PM ET -->
+<!-- analyze.html — Updated 2025-06-10 @ 1:30 PM ET -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -22,6 +22,8 @@
     }
     li {
       margin-bottom: 1rem;
+      line-height: 1.5;
+      font-size: 1rem;
     }
     .section {
       margin-bottom: 3rem;
@@ -78,7 +80,7 @@
       document.getElementById("page-url").textContent = decodeURIComponent(url);
 
       try {
-        const res = await fetch(`https://ai-seo-backend-final.onrender.com/friendly?url=${encodeURIComponent(url)}`);
+        const res = await fetch(`https://snipe-rank-clean.onrender.com/friendly?url=${encodeURIComponent(url)}`);
         const data = await res.json();
 
         if (!data.success) {
@@ -95,14 +97,14 @@
         const strengthsList = document.getElementById("ai-strengths");
         strengths.forEach(item => {
           const li = document.createElement("li");
-          li.textContent = `✅ ${item}`;
+          li.textContent = item;
           strengthsList.appendChild(li);
         });
 
         const opportunitiesList = document.getElementById("ai-opportunities");
         opportunities.forEach(item => {
           const li = document.createElement("li");
-          li.textContent = `🚨 ${item}`;
+          li.textContent = item;
           opportunitiesList.appendChild(li);
         });
 
