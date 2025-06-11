@@ -1,4 +1,4 @@
-// Last updated: June 10, 2025 @ 3:25 PM ET
+// Last updated: June 11, 2025 @ 4:54 PM ET
 import axios from "axios";
 import * as cheerio from "cheerio";
 import OpenAI from "openai";
@@ -10,13 +10,10 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-async function cleanJSON(rawText) {
-  const cleaned = rawText
-    .replace(/^```json\n?/, "")  // remove leading ```json
-    .replace(/^```\n?/, "")      // or just ```
-    .replace(/```$/, "")         // remove trailing ```
-    .trim();
-  return JSON.parse(cleaned);
+// Helper to extract clean JSON from GPT output
+function extractJSONBlock(text) {
+  const match = text.match(/```(?:json)?\s*({[\s\S]*?})\s*```/) || text.match(/({[\s\S]*})/);
+  return match ? match[1] : null;
 }
 
 export default async function friendlyRoute(req, res) {
@@ -27,11 +24,14 @@ export default async function friendlyRoute(req, res) {
   }
 
   try {
-    const response = await axios.get(url, {
-      timeout: 10000,
-      maxRedirects: 5
-    });
+    // Step 1: Follow redirect manually
+    const headRes = await axios.head(url, { maxRedirects: 0, validateStatus: () => true });
+    const finalUrl = [301, 302, 307].includes(headRes.status) && headRes.headers.location
+      ? new URL(headRes.headers.location, url).toString()
+      : url;
 
+    // Step 2: Fetch full HTML
+    const response = await axios.get(finalUrl, { timeout: 10000 });
     const html = response.data;
     const $ = cheerio.load(html);
 
@@ -53,7 +53,7 @@ export default async function friendlyRoute(req, res) {
     const prompt = `
 You are an AI SEO expert auditing a webpage for how well it performs in AI-driven search results.
 
-Here is the page content from: ${url}
+Here is the page content from: ${finalUrl}
 
 Title: "${title}"
 Meta: "${meta}"
@@ -70,12 +70,11 @@ Your task is to evaluate it and return JSON like this:
   "engine_insights": [...]
 }
 
-Requirements:
-- Return exactly ${limits.strengths} items in 'ai_strengths'
-- Return exactly ${limits.issues} items in 'ai_opportunities'
-- Return 5 detailed 'engine_insights' paragraphs (1 for each: Gemini, ChatGPT, Copilot, Claude, Perplexity)
-
-Format: return valid JSON **without** code blocks.
+Instructions:
+- Return exactly ${limits.strengths} 'ai_strengths'
+- Return exactly ${limits.issues} 'ai_opportunities'
+- Return 5 engine_insights (Gemini, ChatGPT, Copilot, Claude, Perplexity)
+- ✅ RETURN ONLY VALID JSON. Do NOT wrap it in \`\`\` or any code block.
 `;
 
     const completion = await openai.chat.completions.create({
@@ -88,8 +87,14 @@ Format: return valid JSON **without** code blocks.
       ],
     });
 
-    const cleaned = await cleanJSON(completion.choices[0].message.content);
-    return res.json(cleaned);
+    const rawOutput = completion.choices[0].message.content;
+    console.log("🧠 GPT OUTPUT:\n", rawOutput);
+
+    const jsonText = extractJSONBlock(rawOutput);
+    if (!jsonText) throw new Error("Could not extract valid JSON from GPT output.");
+
+    const parsed = JSON.parse(jsonText);
+    return res.json(parsed);
 
   } catch (err) {
     console.error("🔥 Error in /friendly:", err.message);
