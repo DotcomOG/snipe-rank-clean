@@ -1,60 +1,93 @@
-// friendly.js — Last updated 2025-06-10 @ 12:48 PM ET
 import axios from "axios";
 import * as cheerio from "cheerio";
+import OpenAI from "openai";
+import dotenv from "dotenv";
+
+dotenv.config();
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
 
 export default async function friendlyRoute(req, res) {
-  const { url } = req.query;
+  const { url, mode = "full" } = req.query;
 
   if (!url) {
-    return res.status(400).json({ success: false, reason: "Missing URL parameter." });
+    return res.status(400).json({ success: false, reason: "Missing URL" });
   }
 
   try {
-    const response = await axios.get(url, { timeout: 10000 });
+    const response = await axios.get(url, {
+      timeout: 10000,
+      maxRedirects: 5,
+      validateStatus: (status) => status >= 200 && status < 400,
+    });
+
     const html = response.data;
     const $ = cheerio.load(html);
 
-    // Dummy scoring logic — replace this with actual scoring engine
     const title = $("title").text().trim();
-    const metaDesc = $('meta[name="description"]').attr("content") || "";
+    const meta = $('meta[name="description"]').attr("content") || "";
     const h1 = $("h1").first().text().trim();
 
-    const score = Math.floor(Math.random() * 20) + 80; // Random 80–99 for now
-
-    const ai_strengths = [
-      "✅ Title tag found: " + title,
-      "✅ Meta description present.",
-      "✅ H1 tag detected: " + h1,
-      "✅ Page is reachable and loads successfully.",
-      "✅ HTML structure appears valid."
-    ];
-
-    const ai_opportunities = [
-      "🚨 Add structured data (e.g., JSON-LD for organization/schema).",
-      "🚨 Improve alt text usage on images.",
-      "🚨 Use more semantic headings for better AI indexing.",
-      "🚨 Add FAQ or Q&A sections to improve generative AI previews.",
-      "🚨 Enhance meta description length and richness."
-    ];
-
-    const engine_insights = [
-      "Gemini looks for meaningful structured content blocks (like FAQs or tables).",
-      "ChatGPT favors clear semantic hierarchy and rich meta tags.",
-      "Copilot indexes intro paragraphs heavily when summarizing pages.",
-      "Claude prioritizes privacy and accessibility signals (ARIA tags).",
-      "Perplexity ranks sites with up-to-date timestamped content higher."
-    ];
-
-    return res.json({
-      success: true,
-      score,
-      ai_strengths,
-      ai_opportunities,
-      engine_insights,
+    let bodyText = "";
+    $("p").each((_, el) => {
+      const text = $(el).text().trim();
+      if (text.length > 40) bodyText += text + "\n";
     });
 
+    const limits = {
+      short: { strengths: 5, issues: 10 },
+      full: { strengths: 7, issues: 20 },
+    }[mode] || limits.full;
+
+    const prompt = `
+You are an AI SEO expert auditing a webpage for how well it performs in AI-driven search results.
+
+Here is the page content from: ${url}
+
+Title: "${title}"
+Meta: "${meta}"
+H1: "${h1}"
+Content:
+${bodyText.slice(0, 4000)}
+
+Your task is to evaluate it and return JSON like this:
+{
+  "success": true,
+  "score": [integer between 60–95],
+  "ai_strengths": [...],
+  "ai_opportunities": [...],
+  "engine_insights": [...]
+}
+
+Requirements:
+- Return exactly ${limits.strengths} items in 'ai_strengths'
+- Return exactly ${limits.issues} items in 'ai_opportunities'
+- Return 5 detailed 'engine_insights' paragraphs (1 for each: Gemini, ChatGPT, Copilot, Claude, Perplexity)
+
+All items must be unique, persuasive, and clear to a non-technical decision maker.
+`;
+
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4-turbo",
+      temperature: 0.7,
+      max_tokens: 1800,
+      messages: [
+        { role: "system", content: "You are a helpful AI SEO analysis assistant." },
+        { role: "user", content: prompt }
+      ],
+    });
+
+    const parsed = JSON.parse(completion.choices[0].message.content);
+    return res.json(parsed);
+
   } catch (err) {
-    console.error("Error in /friendly:", err.message);
-    return res.status(500).json({ success: false, reason: "Failed to analyze URL", error: err.message });
+    console.error("🔥 Error in /friendly:", err.message);
+    return res.status(500).json({
+      success: false,
+      reason: "Failed to analyze site or generate content",
+      error: err.message,
+    });
   }
 }
