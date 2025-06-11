@@ -1,42 +1,95 @@
-<!-- public/index.html — Final Clean Landing Page -->
+<!-- index.html — Updated 2025-06-10 @ 3:05 PM ET -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SnipeRank – AI SEO Analyzer</title>
-  <link rel="stylesheet" href="/style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SnipeRank — AI SEO Analyzer</title>
+  <style>
+    body {
+      font-family: Helvetica, sans-serif;
+      background-color: black;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    h1, h2 {
+      text-align: center;
+    }
+    form {
+      margin-top: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    input {
+      margin: 0.5rem 0;
+      padding: 0.75rem;
+      width: 300px;
+      font-size: 1rem;
+    }
+    button {
+      margin-top: 1rem;
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      background-color: white;
+      color: black;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #eee;
+    }
+    .error {
+      color: red;
+      margin-top: 1rem;
+    }
+  </style>
 </head>
-<body class="bg-white text-black font-sans flex items-center justify-center min-h-screen px-4">
+<body>
+  <h1>🤖 SnipeRank 🤖</h1>
+  <h2>AI SEO Analyzer</h2>
 
-  <div class="w-full max-w-xl bg-white p-8 rounded-xl shadow-md border border-gray-200 space-y-6 text-center">
-    <h1 class="text-4xl font-bold mb-4">🤖 SnipeRank<br/>AI SEO Analyzer 🤖</h1>
-
-    <p class="text-gray-700 text-lg mb-4">
-      Instantly score any webpage for AI SEO readiness.
-    </p>
-
-    <input id="urlInput" type="text" placeholder="https://example.com"
-      class="w-full p-3 rounded border border-gray-300 text-black" />
-
-    <button id="submitBtn"
-      class="w-full bg-black text-white py-2 px-4 rounded hover:bg-gray-800">Analyze</button>
-
-    <p class="text-sm text-gray-400 mt-2">Results open on next screen</p>
-  </div>
+  <form id="analyze-form">
+    <input type="text" id="url" name="url" placeholder="Enter website URL" required>
+    <input type="text" id="name" name="name" placeholder="Your Full Name" required>
+    <input type="email" id="email" name="email" placeholder="Your Email Address" required>
+    <button type="submit">Run AI SEO Analysis</button>
+    <div id="error-message" class="error"></div>
+  </form>
 
   <script>
-    console.log("✅ index.js inline script loaded");
-    document.getElementById('submitBtn').onclick = function () {
-      const url = document.getElementById('urlInput').value.trim();
-      try {
-        new URL(url);
-      } catch {
-        alert('Please enter a valid URL (starting with https://)');
+    function isValidURL(input) {
+      // Accepts domains like example.com or full URLs like https://example.com
+      const pattern = /^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/.*)?$/;
+      return pattern.test(input);
+    }
+
+    document.getElementById("analyze-form").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      let url = document.getElementById("url").value.trim();
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const errorDiv = document.getElementById("error-message");
+
+      if (!isValidURL(url)) {
+        errorDiv.textContent = "Please enter a valid website URL (e.g., example.com or https://example.com)";
         return;
       }
-      window.location.href = `/analyze.html?url=${encodeURIComponent(url)}`;
-    };
+
+      // Add https:// if scheme is missing
+      if (!/^https?:\/\//i.test(url)) {
+        url = "https://" + url;
+      }
+
+      const query = `analyze.html?url=${encodeURIComponent(url)}&name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}`;
+      window.location.href = query;
+    });
   </script>
 </body>
 </html>
