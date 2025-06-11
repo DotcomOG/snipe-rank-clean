@@ -1,4 +1,4 @@
-<!-- index.html — Updated 2025-06-10 @ 3:05 PM ET -->
+<!-- index.html — Updated 2025-06-10 @ 3:20 PM ET -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -56,15 +56,12 @@
 
   <form id="analyze-form">
     <input type="text" id="url" name="url" placeholder="Enter website URL" required>
-    <input type="text" id="name" name="name" placeholder="Your Full Name" required>
-    <input type="email" id="email" name="email" placeholder="Your Email Address" required>
     <button type="submit">Run AI SEO Analysis</button>
     <div id="error-message" class="error"></div>
   </form>
 
   <script>
     function isValidURL(input) {
-      // Accepts domains like example.com or full URLs like https://example.com
       const pattern = /^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(\/.*)?$/;
       return pattern.test(input);
     }
@@ -73,8 +70,6 @@
       e.preventDefault();
 
       let url = document.getElementById("url").value.trim();
-      const name = document.getElementById("name").value.trim();
-      const email = document.getElementById("email").value.trim();
       const errorDiv = document.getElementById("error-message");
 
       if (!isValidURL(url)) {
@@ -82,13 +77,11 @@
         return;
       }
 
-      // Add https:// if scheme is missing
       if (!/^https?:\/\//i.test(url)) {
         url = "https://" + url;
       }
 
-      const query = `analyze.html?url=${encodeURIComponent(url)}&name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}`;
-      window.location.href = query;
+      window.location.href = `analyze.html?url=${encodeURIComponent(url)}`;
     });
   </script>
 </body>
