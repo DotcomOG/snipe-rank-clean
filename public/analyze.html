@@ -1,4 +1,5 @@
-<!-- analyze.html — Updated 2025-06-10 @ 2:45 PM ET -->
+
+<!-- analyze.html — Updated 2025-06-10 @ 3:40 PM ET -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,7 +16,10 @@
     }
     h1, h2 {
       text-align: center;
-      margin-bottom: 0.5rem;
+      margin: 0;
+    }
+    h2 {
+      margin-bottom: 1rem;
     }
     .section {
       margin-bottom: 2.5rem;
@@ -63,8 +67,8 @@
   </style>
 </head>
 <body>
-  <h1>🤖 SnipeRank</h1>
-  <h2>AI SEO Analyzer 🤖</h2>
+  <h1>🤖 SnipeRank 🤖</h1>
+  <h2>AI SEO Analyzer</h2>
 
   <div id="loading" class="centered">SnipeRank is analyzing. It may take up to a minute...</div>
 
@@ -75,32 +79,30 @@
     </div>
 
     <div class="section centered">
-      <h3>📊 Overall Score</h3>
+      <h3>Overall Score</h3>
       <p id="overall-score" style="font-size: 2rem; font-weight: bold;"></p>
     </div>
 
     <div class="section">
-      <h3>✅ What’s Working</h3>
+      <h3>What’s Working</h3>
       <ul id="ai-strengths"></ul>
     </div>
 
     <div class="section">
-      <h3>🚨 Needs Attention</h3>
+      <h3>Needs Attention</h3>
       <ul id="ai-opportunities"></ul>
     </div>
 
     <div class="section">
-      <h3>🧠 AI Engine Insights</h3>
+      <h3>🤖 AI Engine Insights</h3>
       <ul id="ai-insights"></ul>
     </div>
 
     <div class="section">
-      <h3 class="centered">📩 Request Your Full Report</h3>
+      <h3 class="centered">Request Your Full Report</h3>
       <form id="contact-form" class="centered">
         <input type="text" id="name" name="name" placeholder="Your Full Name" required>
         <input type="email" id="email" name="email" placeholder="Your Email Address" required>
-        <input type="text" id="phone" name="phone" placeholder="Your Phone Number (Optional)">
-        <input type="text" id="company" name="company" placeholder="Company / Organization (Optional)">
         <button type="submit">Get Full Report</button>
       </form>
     </div>
@@ -110,8 +112,6 @@
     async function runAnalysis() {
       const params = new URLSearchParams(window.location.search);
       const url = params.get("url");
-      const name = params.get("name") || "";
-      const email = params.get("email") || "";
 
       if (!url) {
         document.getElementById("loading").textContent = "No URL provided.";
@@ -119,8 +119,6 @@
       }
 
       document.getElementById("page-url").textContent = decodeURIComponent(url);
-      document.getElementById("name").value = decodeURIComponent(name);
-      document.getElementById("email").value = decodeURIComponent(email);
 
       try {
         const res = await fetch(`https://snipe-rank-clean.onrender.com/friendly?url=${encodeURIComponent(url)}`);
@@ -172,10 +170,8 @@
       const url = new URLSearchParams(window.location.search).get("url") || "";
       const name = document.getElementById("name").value;
       const email = document.getElementById("email").value;
-      const phone = document.getElementById("phone").value;
-      const company = document.getElementById("company").value;
 
-      const redirectURL = `full-report.html?url=${encodeURIComponent(url)}&name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}&phone=${encodeURIComponent(phone)}&company=${encodeURIComponent(company)}`;
+      const redirectURL = `full-report.html?url=${encodeURIComponent(url)}&name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}`;
       window.location.href = redirectURL;
     });
 
