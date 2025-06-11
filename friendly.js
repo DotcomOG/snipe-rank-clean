@@ -1,3 +1,4 @@
+// Last updated: June 10, 2025 @ 3:25 PM ET
 import axios from "axios";
 import * as cheerio from "cheerio";
 import OpenAI from "openai";
@@ -9,6 +10,15 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+async function cleanJSON(rawText) {
+  const cleaned = rawText
+    .replace(/^```json\n?/, "")  // remove leading ```json
+    .replace(/^```\n?/, "")      // or just ```
+    .replace(/```$/, "")         // remove trailing ```
+    .trim();
+  return JSON.parse(cleaned);
+}
+
 export default async function friendlyRoute(req, res) {
   const { url, mode = "full" } = req.query;
 
@@ -19,8 +29,7 @@ export default async function friendlyRoute(req, res) {
   try {
     const response = await axios.get(url, {
       timeout: 10000,
-      maxRedirects: 5,
-      validateStatus: (status) => status >= 200 && status < 400,
+      maxRedirects: 5
     });
 
     const html = response.data;
@@ -66,7 +75,7 @@ Requirements:
 - Return exactly ${limits.issues} items in 'ai_opportunities'
 - Return 5 detailed 'engine_insights' paragraphs (1 for each: Gemini, ChatGPT, Copilot, Claude, Perplexity)
 
-All items must be unique, persuasive, and clear to a non-technical decision maker.
+Format: return valid JSON **without** code blocks.
 `;
 
     const completion = await openai.chat.completions.create({
@@ -79,8 +88,8 @@ All items must be unique, persuasive, and clear to a non-technical decision make
       ],
     });
 
-    const parsed = JSON.parse(completion.choices[0].message.content);
-    return res.json(parsed);
+    const cleaned = await cleanJSON(completion.choices[0].message.content);
+    return res.json(cleaned);
 
   } catch (err) {
     console.error("🔥 Error in /friendly:", err.message);
