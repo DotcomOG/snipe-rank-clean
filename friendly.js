@@ -1,3 +1,4 @@
+// Last updated: June 10, 2025 @ 2:46 PM ET
 import axios from "axios";
 import * as cheerio from "cheerio";
 import OpenAI from "openai";
