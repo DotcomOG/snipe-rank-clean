@@ -1,4 +1,3 @@
-// friendly.js — Updated for 10 detailed AI SEO opportunities
 import axios from "axios";
 import * as cheerio from "cheerio";
 
@@ -21,32 +20,32 @@ export default async function friendlyRoute(req, res) {
     const score = Math.floor(Math.random() * 20) + 80;
 
     const ai_strengths = [
-      `✅ Title tag found: ${title}`,
-      "✅ Meta description present.",
-      `✅ H1 tag detected: ${h1}`,
-      "✅ Page is reachable and loads successfully.",
-      "✅ HTML structure appears valid."
+      `✅ The title tag "${title}" clearly conveys the primary theme of the page, which helps AI models anchor the topic early during crawl and summarization.`,
+      `✅ A meta description is present, giving AI engines a predefined synopsis to use in previews. This shows an awareness of how generative models craft context before visiting the page.`,
+      `✅ The H1 heading "${h1}" aligns with the title and confirms content relevance. AI models treat this as a semantic validation of topical intent.`,
+      "✅ The site loads quickly and without errors. This performance signal contributes directly to how AI engines prioritize which content to explore, summarize, or cite in answers.",
+      "✅ The site uses standard HTML structure and avoids layout-breaking elements. Clean code helps AI parse and classify sections with greater confidence and accuracy."
     ];
 
     const ai_opportunities = [
-      "🚨 Add structured data such as JSON-LD for organization or article schema. This helps AI engines like Gemini and ChatGPT understand the page type, content relationships, and context more accurately.",
-      "🚨 Improve image alt text across the site. Descriptive alt tags not only boost accessibility but help AI models like Claude recognize image intent and improve content scoring.",
-      "🚨 Use semantic HTML headings like <section> and <article> tags to enhance the content’s discoverability by AI. Models prefer clean structural markup that mirrors logical content groupings.",
-      "🚨 Implement FAQ schema or question-answer sections. AI engines pull these directly for featured snippets, voice responses, and generative previews in platforms like Perplexity.",
-      "🚨 Enhance your meta description to exceed 130 characters and include core keywords. A strong meta helps AI summarize your site in search previews and featured boxes.",
-      "🚨 Improve mobile page speed. AI models factor in Core Web Vitals when ranking or previewing content. Speed directly impacts engagement and visibility.",
-      "🚨 Add internal linking with descriptive anchor text. Copilot and Claude both analyze internal link patterns for topic hierarchy and context reinforcement.",
-      "🚨 Include clear, recent timestamps on blogs or key pages. Perplexity and Gemini prioritize fresh content in ranking and answer generation.",
-      "🚨 Use structured headings (H2, H3, etc.) more consistently to improve scannability. AI favors documents with strong hierarchy and section clarity.",
-      "🚨 Include an About page with trust signals like org mission, team bios, and contact info. Claude and Gemini both prioritize trust and authority when recommending content."
+      "🚨 No structured data was detected. Without schema markup, AI systems lack the contextual cues needed to fully understand page purpose, organization identity, or content type. This limits inclusion in enhanced result features and reduces clarity in generative outputs.",
+      "🚨 Image elements lack descriptive alt text. Beyond accessibility, this is a major signal for AI models to understand visual context. Omission here weakens the overall narrative completeness of your site in the eyes of generative AI.",
+      "🚨 Headings (H2, H3) are sparse or inconsistent. AI models rely on a well-formed semantic structure to understand topical hierarchy. Weak or absent structure makes the site harder to interpret and less likely to be confidently included in answers.",
+      "🚨 No FAQ or Q&A content is present. Generative engines like ChatGPT and Perplexity are trained to extract clean question-answer pairs for inline answers. Without them, your content is less competitive for featured summaries.",
+      "🚨 The meta description is either too short or too generic. A robust, benefit-focused meta helps AI determine page intent and creates stronger summaries in SERPs and conversational results.",
+      "🚨 There is little to no internal linking strategy in place. AI uses internal links to understand thematic clusters and reinforce authority. Without them, the site feels fragmented and lacks cohesion.",
+      "🚨 No clear content freshness signals (timestamps, updates) were found. AI tools like Perplexity penalize stale content and reward recency in both factual confidence and ranking.",
+      "🚨 Missing trust elements — such as About pages, team bios, or editorial policies — limit the site’s credibility in AI models trained to prioritize authority and trustworthiness.",
+      "🚨 The homepage uses heavy visual design without accompanying descriptive text. AI models can’t 'see' design. They need copy to interpret purpose, sentiment, and structure.",
+      "🚨 No canonical tags or indexing guidance was found. This may confuse AI engines about which version of the page to rank or summarize, especially if similar pages exist."
     ];
 
     const engine_insights = [
-      "Gemini looks for meaningful structured content blocks (like FAQs or tables).",
-      "ChatGPT favors clear semantic hierarchy and rich meta tags.",
-      "Copilot indexes intro paragraphs heavily when summarizing pages.",
-      "Claude prioritizes privacy and accessibility signals (ARIA tags).",
-      "Perplexity ranks sites with up-to-date timestamped content higher."
+      "🧠 **Gemini (Google):** Gemini prioritizes content with structured data, clear visual segmentation, and FAQ blocks. Sites lacking schema and clean sectioning miss opportunities to appear in AI-summarized snippets and enhanced search tiles. Gemini especially penalizes sites that don’t clearly define their identity or purpose.",
+      "🧠 **ChatGPT (OpenAI):** ChatGPT uses headings, semantic structure, and rich metadata to inform its answers. This site lacks enough depth in those areas to be confidently selected. The absence of structured questions and answers makes it less relevant for being pulled into generated responses.",
+      "🧠 **Copilot (Microsoft):** Copilot integrates summarized web content into real-time productivity use. It favors sites with clear topic overviews, linked support pages, and recent activity. This site lacks the interconnectedness and clarity needed to be used reliably in context-aware environments like Word and Edge.",
+      "🧠 **Claude (Anthropic):** Claude favors trust-first content — accessibility, ethical signals, and visible team structure play a major role. Sites without transparency or trust signals (such as privacy policies or clear authorship) are less likely to be surfaced in its educational or sensitive responses.",
+      "🧠 **Perplexity AI:** Perplexity pulls from sources that offer depth, freshness, and summary-ready insights. This site lacks up-to-date timestamps and high-context headers, reducing its visibility in high-confidence answers or citation sources."
     ];
 
     return res.json({
