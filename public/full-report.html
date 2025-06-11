@@ -1,56 +1,182 @@
-<!-- public/full-report.html — Detailed AI SEO report -->
+<!-- full-report.html — Updated 2025-06-10 @ 3:55 PM ET -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SnipeRank – AI SEO Analyzer</title>
-<link href="/style.css" rel="stylesheet">
+  <title>Full Report – SnipeRank</title>
+  <style>
+    body {
+      font-family: Helvetica, sans-serif;
+      margin: 0;
+      padding: 2rem;
+      background-color: white;
+      color: black;
+    }
+    h1, h2 {
+      text-align: center;
+      margin: 0;
+    }
+    h2 {
+      margin-bottom: 1rem;
+    }
+    .section {
+      margin-bottom: 2.5rem;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .centered {
+      text-align: center;
+    }
+    ul {
+      list-style-type: none;
+      padding-left: 0;
+    }
+    li {
+      margin-bottom: 1.5rem;
+      line-height: 1.6;
+      font-size: 1rem;
+    }
+    .row-line {
+      text-align: center;
+      font-weight: bold;
+      font-size: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    input, textarea {
+      display: block;
+      width: 100%;
+      padding: 0.5rem;
+      margin-top: 0.5rem;
+      margin-bottom: 1rem;
+      font-size: 1rem;
+    }
+    button {
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      background-color: black;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #333;
+    }
+    .score-line {
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin-bottom: 2rem;
+    }
+  </style>
 </head>
-<body class="bg-white text-black font-sans">
+<body>
+  <h1>🤖 SnipeRank 🤖</h1>
+  <h2>AI SEO Analyzer</h2>
 
-  <header class="text-center py-8">
-    <h1 class="text-4xl font-bold">Detailed AI SEO Report</h1>
-  </header>
+  <div id="loading" class="centered">Please wait while we generate your detailed report...</div>
 
-  <div id="loadingMessage" class="text-center mt-10 text-lg">
-    Please wait while we generate your detailed report...
+  <div id="results" style="display: none;">
+
+    <div class="section">
+      <div class="row-line">Tested URL: <span id="page-url"></span></div>
+    </div>
+
+    <div class="section">
+      <div class="score-line">Overall Score: <span id="overall-score"></span></div>
+    </div>
+
+    <div class="section">
+      <h3>What’s Working</h3>
+      <ul id="ai-strengths"></ul>
+    </div>
+
+    <div class="section">
+      <h3>Needs Attention</h3>
+      <ul id="ai-opportunities"></ul>
+    </div>
+
+    <div class="section">
+      <h3>🤖 AI Engine Insights</h3>
+      <ul id="ai-insights"></ul>
+    </div>
+
+    <div class="section">
+      <h3 class="centered">Request Your Full Report</h3>
+      <form id="contact-form" class="centered" method="POST" action="https://formspree.io/f/mayzkzed">
+        <input type="text" id="name" name="name" placeholder="Your Full Name" required>
+        <input type="email" id="email" name="email" placeholder="Your Email Address" required>
+        <input type="text" id="phone" name="phone" placeholder="Your Phone Number" required>
+        <input type="text" name="company" placeholder="Company / Organization (Optional)">
+        <textarea name="notes" placeholder="Additional Notes (Optional)"></textarea>
+        <button type="submit">Submit Request</button>
+      </form>
+    </div>
   </div>
 
-  <div id="reportContent" class="hidden">
-    <main class="max-w-4xl mx-auto px-6 py-8 space-y-6">
-      <div id="fullResultUrl" class="text-xl font-semibold text-center"></div>
-      <div id="fullScore" class="text-center text-2xl font-bold"></div>
+  <script>
+    async function runFullReport() {
+      const params = new URLSearchParams(window.location.search);
+      const url = params.get("url");
+      const name = params.get("name") || "";
+      const email = params.get("email") || "";
 
-      <section>
-        <h2 class="text-xl font-bold mt-8 mb-2">5 AI Superpowers</h2>
-        <ul id="fullSuperpowers" class="list-none space-y-2"></ul>
-      </section>
+      if (!url) {
+        document.getElementById("loading").textContent = "No URL provided.";
+        return;
+      }
 
-      <section>
-        <h2 class="text-xl font-bold mt-8 mb-2">10 AI SEO Opportunities</h2>
-        <ul id="fullOpportunities" class="list-none space-y-2"></ul>
-      </section>
+      document.getElementById("page-url").textContent = decodeURIComponent(url);
+      document.getElementById("name").value = decodeURIComponent(name);
+      document.getElementById("email").value = decodeURIComponent(email);
 
-      <section>
-        <h2 class="text-xl font-bold mt-8 mb-2">AI Engine Insights</h2>
-        <ul id="fullInsights" class="list-none space-y-2"></ul>
-      </section>
+      try {
+        const res = await fetch(`https://snipe-rank-clean.onrender.com/friendly?url=${encodeURIComponent(url)}`);
+        const data = await res.json();
 
-      <section id="fullContactForm" class="mt-12 border-t border-gray-300 pt-8">
-        <h3 class="text-2xl font-semibold mb-4">Want a custom strategy?</h3>
-        <form class="space-y-4" action="https://formspree.io/f/moqgnyoq" method="POST">
-          <input id="followupName" name="name" type="text" placeholder="Name" class="w-full p-2 rounded border text-black" required />
-          <input id="followupEmail" name="email" type="email" placeholder="Email" class="w-full p-2 rounded border text-black" required />
-          <input name="phone" type="tel" placeholder="Phone (optional)" class="w-full p-2 rounded border text-black" />
-          <input name="company" type="text" placeholder="Company/Organization" class="w-full p-2 rounded border text-black" />
-          <textarea name="message" placeholder="Notes or questions" class="w-full p-2 rounded border text-black h-32"></textarea>
-          <button type="submit" class="bg-black text-white px-4 py-2 rounded hover:bg-gray-800">Send</button>
-        </form>
-      </section>
-    </main>
-  </div>
+        if (!data.success) {
+          document.getElementById("loading").textContent = "Analysis failed. Please try again.";
+          return;
+        }
 
-  <script src="full-report.js"></script>
+        document.getElementById("overall-score").textContent = data.score;
+
+        const strengths = data.ai_strengths?.slice(0, 7) || [];
+        const opportunities = data.ai_opportunities?.slice(0, 20) || [];
+        const insights = data.engine_insights || [];
+
+        const strengthsList = document.getElementById("ai-strengths");
+        strengths.forEach(item => {
+          const li = document.createElement("li");
+          li.textContent = typeof item === 'string' ? item : JSON.stringify(item);
+          strengthsList.appendChild(li);
+        });
+
+        const opportunitiesList = document.getElementById("ai-opportunities");
+        opportunities.forEach(item => {
+          const li = document.createElement("li");
+          li.textContent = typeof item === 'string' ? item : JSON.stringify(item);
+          opportunitiesList.appendChild(li);
+        });
+
+        const insightsList = document.getElementById("ai-insights");
+        insights.forEach(item => {
+          const li = document.createElement("li");
+          li.textContent = typeof item === 'string' ? item : JSON.stringify(item);
+          insightsList.appendChild(li);
+        });
+
+        document.getElementById("loading").style.display = "none";
+        document.getElementById("results").style.display = "block";
+
+      } catch (err) {
+        console.error(err);
+        document.getElementById("loading").textContent = "Error fetching report.";
+      }
+    }
+
+    runFullReport();
+  </script>
 </body>
 </html>
