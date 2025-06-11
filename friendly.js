@@ -1,4 +1,4 @@
-// Last updated: June 10, 2025 @ 2:46 PM ET
+// Last updated: June 10, 2025 @ 4:18 PM ET
 import axios from "axios";
 import * as cheerio from "cheerio";
 import OpenAI from "openai";
@@ -20,8 +20,7 @@ export default async function friendlyRoute(req, res) {
   try {
     const response = await axios.get(url, {
       timeout: 10000,
-      maxRedirects: 5,
-      validateStatus: (status) => status >= 200 && status < 400,
+      maxRedirects: 5
     });
 
     const html = response.data;
