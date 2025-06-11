@@ -1,4 +1,4 @@
-<!-- analyze.html — Updated 2025-06-10 @ 2:00 PM ET -->
+<!-- analyze.html — Updated 2025-06-10 @ 2:45 PM ET -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,14 +13,18 @@
       background-color: white;
       color: black;
     }
-    h1, h2, h3 {
+    h1, h2 {
       text-align: center;
+      margin-bottom: 0.5rem;
     }
     .section {
-      margin-bottom: 3rem;
+      margin-bottom: 2.5rem;
       max-width: 800px;
       margin-left: auto;
       margin-right: auto;
+    }
+    .centered {
+      text-align: center;
     }
     ul {
       list-style-type: none;
@@ -31,10 +35,13 @@
       line-height: 1.6;
       font-size: 1rem;
     }
-    .centered {
+    .row-line {
       text-align: center;
+      font-weight: bold;
+      font-size: 1rem;
+      margin-bottom: 1.5rem;
     }
-    input, textarea {
+    input {
       display: block;
       width: 100%;
       padding: 0.5rem;
@@ -63,9 +70,8 @@
 
   <div id="results" style="display: none;">
 
-    <div class="section centered">
-      <h3>🔗 Tested URL</h3>
-      <p id="page-url" style="font-weight: bold;"></p>
+    <div class="section">
+      <div class="row-line">🔗 Tested URL: <span id="page-url"></span></div>
     </div>
 
     <div class="section centered">
@@ -90,11 +96,11 @@
 
     <div class="section">
       <h3 class="centered">📩 Request Your Full Report</h3>
-      <form id="contact-form" class="centered" method="POST" action="https://formspree.io/f/mayzkzed">
+      <form id="contact-form" class="centered">
         <input type="text" id="name" name="name" placeholder="Your Full Name" required>
         <input type="email" id="email" name="email" placeholder="Your Email Address" required>
-        <input type="text" name="phone" placeholder="Your Phone Number (Optional)">
-        <input type="text" name="company" placeholder="Company / Organization (Optional)">
+        <input type="text" id="phone" name="phone" placeholder="Your Phone Number (Optional)">
+        <input type="text" id="company" name="company" placeholder="Company / Organization (Optional)">
         <button type="submit">Get Full Report</button>
       </form>
     </div>
@@ -160,6 +166,18 @@
         document.getElementById("loading").textContent = "Error fetching analysis.";
       }
     }
+
+    document.getElementById("contact-form").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const url = new URLSearchParams(window.location.search).get("url") || "";
+      const name = document.getElementById("name").value;
+      const email = document.getElementById("email").value;
+      const phone = document.getElementById("phone").value;
+      const company = document.getElementById("company").value;
+
+      const redirectURL = `full-report.html?url=${encodeURIComponent(url)}&name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}&phone=${encodeURIComponent(phone)}&company=${encodeURIComponent(company)}`;
+      window.location.href = redirectURL;
+    });
 
     runAnalysis();
   </script>
