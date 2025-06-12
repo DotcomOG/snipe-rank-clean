@@ -1,111 +1,49 @@
-<!-- Last updated: June 11, 2025 @ 1:52 PM ET -->
+<!-- full-report.html — Last updated: June 11, 2025 @ 4:57 PM ET -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Full AI SEO Report</title>
-  <style>
-    body {
-      font-family: Helvetica, sans-serif;
-      margin: 0;
-      padding: 2rem;
-      background-color: white;
-      color: black;
-    }
-    h1, h2 {
-      text-align: center;
-      margin: 0;
-    }
-    h2 {
-      margin-bottom: 1.5rem;
-    }
-    .section {
-      margin-bottom: 2.5rem;
-      max-width: 800px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    .centered {
-      text-align: center;
-    }
-    ul {
-      list-style-type: none;
-      padding-left: 0;
-    }
-    li {
-      margin-bottom: 1.25rem;
-      line-height: 1.5;
-    }
-    input, textarea {
-      display: block;
-      width: 100%;
-      padding: 0.5rem;
-      margin-top: 0.5rem;
-      margin-bottom: 1rem;
-      font-size: 1rem;
-    }
-    button {
-      padding: 0.75rem 1.5rem;
-      font-size: 1rem;
-      background-color: black;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #444;
-    }
-    .score-line {
-      text-align: center;
-      font-size: 1.5rem;
-      font-weight: bold;
-      margin-bottom: 2rem;
-    }
-  </style>
+  <title>Full AI SEO Report – SnipeRank</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-  <h1>🤖 SnipeRank 🤖</h1>
-  <h2>AI SEO Analyzer</h2>
+<body class="bg-white text-black font-sans">
 
-  <div id="loading" class="centered">Please wait while we generate your detailed report...</div>
+  <header class="text-center py-8">
+    <h1 class="text-4xl font-bold">Full AI SEO Analysis Report</h1>
+  </header>
 
-  <div id="results" style="display: none;">
-    <div class="section centered">
-      <p><strong>Tested URL:</strong> <span id="page-url"></span></p>
-    </div>
+  <main class="max-w-4xl mx-auto px-6 py-8 space-y-6">
+    <div id="fullResultUrl" class="text-xl font-semibold text-center"></div>
+    <div id="fullScore" class="text-center text-2xl font-bold"></div>
 
-    <div class="section">
-      <div class="score-line">Overall Score: <span id="overall-score"></span></div>
-    </div>
+    <section>
+      <h2 class="text-xl font-bold mt-8 mb-2">What’s Working</h2>
+      <ul id="fullStrengths" class="list-disc list-inside space-y-2"></ul>
+    </section>
 
-    <div class="section">
-      <h3>✅ What’s Working</h3>
-      <ul id="ai-strengths"></ul>
-    </div>
+    <section>
+      <h2 class="text-xl font-bold mt-8 mb-2">Needs Attention</h2>
+      <ul id="fullOpportunities" class="list-disc list-inside space-y-2"></ul>
+    </section>
 
-    <div class="section">
-      <h3>🚨 Needs Attention</h3>
-      <ul id="ai-opportunities"></ul>
-    </div>
+    <section>
+      <h2 class="text-xl font-bold mt-8 mb-2">AI Engine Insights</h2>
+      <ul id="fullEngineInsights" class="list-disc list-inside space-y-2"></ul>
+    </section>
 
-    <div class="section">
-      <h3>🤖 AI Engine Insights</h3>
-      <ul id="ai-insights"></ul>
-    </div>
-
-    <div class="section">
-      <h3 class="centered">📩 Complete Your Request</h3>
-      <form id="contact-form" class="centered" method="POST" action="https://formspree.io/f/mayzkzed">
-        <input type="text" id="name" name="name" placeholder="Your Full Name" required>
-        <input type="email" id="email" name="email" placeholder="Your Email Address" required>
-        <input type="text" id="phone" name="phone" placeholder="Your Phone Number" required>
-        <input type="text" name="company" placeholder="Company / Organization (Optional)">
-        <textarea name="notes" placeholder="Additional Notes (Optional)"></textarea>
-        <button type="submit">Submit Request</button>
+    <section id="fullContactForm" class="mt-12 border-t border-gray-300 pt-8">
+      <h3 class="text-2xl font-semibold mb-4">Request a Free AI SEO Consultation</h3>
+      <form method="POST" action="https://formspree.io/f/mayzkzed" class="space-y-4">
+        <input type="text" id="name" name="name" placeholder="Your Full Name" class="w-full p-2 rounded border text-black" required />
+        <input type="email" id="email" name="email" placeholder="Your Email Address" class="w-full p-2 rounded border text-black" required />
+        <input type="tel" name="phone" placeholder="Phone (required)" class="w-full p-2 rounded border text-black" required />
+        <input type="text" name="company" placeholder="Company / Organization (Optional)" class="w-full p-2 rounded border text-black" />
+        <textarea name="notes" placeholder="Your message (Optional)" class="w-full p-2 rounded border text-black h-32"></textarea>
+        <button type="submit" class="bg-black text-white px-4 py-2 rounded hover:bg-gray-800">Send</button>
       </form>
-    </div>
-  </div>
+    </section>
+  </main>
 
   <script>
     async function runFullReport() {
@@ -114,57 +52,41 @@
       const name = params.get("name") || "";
       const email = params.get("email") || "";
 
-      if (!url) {
-        document.getElementById("loading").textContent = "No URL provided.";
-        return;
-      }
-
-      document.getElementById("page-url").textContent = decodeURIComponent(url);
       document.getElementById("name").value = decodeURIComponent(name);
       document.getElementById("email").value = decodeURIComponent(email);
+      document.getElementById("fullResultUrl").textContent = decodeURIComponent(url);
 
       try {
-        const res = await fetch(`https://snipe-rank-clean.onrender.com/friendly?url=${encodeURIComponent(url)}&mode=full`);
+        const res = await fetch(`/api/full.js?url=${encodeURIComponent(url)}`);
         const data = await res.json();
 
         if (!data.success) {
-          document.getElementById("loading").textContent = "Analysis failed. Please try again.";
+          document.body.innerHTML += "<p class='text-red-500 text-center mt-8'>Analysis failed. Try again.</p>";
           return;
         }
 
-        document.getElementById("overall-score").textContent = data.score;
+        document.getElementById("fullScore").textContent = `Score: ${data.score}`;
 
-        const strengths = (data.ai_strengths || []).slice(0, 7);
-        const opportunities = (data.ai_opportunities || []).slice(0, 20);
-        const insights = data.engine_insights || [];
-
-        const strengthsList = document.getElementById("ai-strengths");
-        strengths.forEach(item => {
+        (data.ai_strengths || []).forEach(item => {
           const li = document.createElement("li");
-          li.textContent = typeof item === "string" ? item : JSON.stringify(item);
-          strengthsList.appendChild(li);
+          li.textContent = item;
+          document.getElementById("fullStrengths").appendChild(li);
         });
 
-        const opportunitiesList = document.getElementById("ai-opportunities");
-        opportunities.forEach(item => {
+        (data.ai_opportunities || []).forEach(item => {
           const li = document.createElement("li");
-          li.textContent = typeof item === "string" ? item : JSON.stringify(item);
-          opportunitiesList.appendChild(li);
+          li.textContent = item;
+          document.getElementById("fullOpportunities").appendChild(li);
         });
 
-        const insightsList = document.getElementById("ai-insights");
-        insights.forEach(item => {
+        (data.engine_insights || []).forEach(item => {
           const li = document.createElement("li");
-          li.textContent = typeof item === "string" ? item : JSON.stringify(item);
-          insightsList.appendChild(li);
+          li.textContent = item;
+          document.getElementById("fullEngineInsights").appendChild(li);
         });
-
-        document.getElementById("loading").style.display = "none";
-        document.getElementById("results").style.display = "block";
-
       } catch (err) {
         console.error(err);
-        document.getElementById("loading").textContent = "Error fetching full report.";
+        document.body.innerHTML += "<p class='text-red-500 text-center mt-8'>Error loading report.</p>";
       }
     }
 
