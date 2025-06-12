@@ -1,4 +1,4 @@
-// Last updated: June 11, 2025 @ 1:07 PM ET
+// Last updated: June 11, 2025 @ 13:11 PM ET
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import OpenAI from 'openai';
@@ -6,45 +6,70 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+if (!process.env.OPENAI_API_KEY) {
+  throw new Error("❌ OPENAI_API_KEY is missing. Please set it in your Render or .env configuration.");
+}
+
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-// Extract JSON from possible fenced blocks
+// Secure URL validator — blocks localhost/IPs and invalid schemes
+function isValidPublicUrl(input) {
+  try {
+    const parsed = new URL(input);
+    const host = parsed.hostname;
+    const blocked = ["localhost", "127.0.0.1"];
+    return (
+      (parsed.protocol === "http:" || parsed.protocol === "https:") &&
+      !blocked.includes(host) &&
+      !/^10\.\d+\.\d+\.\d+/.test(host) &&
+      !/^192\.168\.\d+\.\d+/.test(host) &&
+      !/^172\.(1[6-9]|2\d|3[0-1])\.\d+\.\d+/.test(host)
+    );
+  } catch {
+    return false;
+  }
+}
+
 function extractJSONBlock(text) {
   const match =
-    text.match(/```(?:json)?\s*({[\s\S]*?})\s*```/) || text.match(/({[\s\S]*})/);
+    text.match(/```(?:json)?\s*({[\s\S]*?})\s*```/) ||
+    text.match(/({[\s\S]*})/);
   return match ? match[1] : null;
 }
 
 export default async function friendlyRoute(req, res) {
-  const { url, mode = 'full' } = req.query;
+  const { url, mode = 'short' } = req.query;
 
-  if (!url) {
-    return res.status(400).json({ success: false, reason: 'Missing URL' });
+  if (!url || !isValidPublicUrl(url)) {
+    return res.status(400).json({ success: false, reason: 'Invalid or missing URL' });
   }
 
   try {
-    // Attempt HEAD request to discover redirects
+    // HEAD request to resolve initial redirect
     const headRes = await axios.head(url, {
       maxRedirects: 0,
       validateStatus: () => true,
     });
 
-    const redirectStatuses = [301, 302, 307, 308];
-    const firstUrl =
+    const redirectStatuses = [301, 302, 303, 307, 308];
+    const resolvedUrl =
       redirectStatuses.includes(headRes.status) && headRes.headers.location
         ? new URL(headRes.headers.location, url).toString()
         : url;
 
-    // Follow redirects for the GET request
-    const getRes = await axios.get(firstUrl, {
+    // GET content with headers
+    const getRes = await axios.get(resolvedUrl, {
       timeout: 10000,
       maxRedirects: 5,
-      validateStatus: (status) => status < 400,
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36",
+      },
     });
 
-    const finalUrl = getRes.request?.res?.responseUrl || firstUrl;
+    const finalUrl = getRes.request?.res?.responseUrl || resolvedUrl;
     const html = getRes.data;
     const $ = cheerio.load(html);
 
@@ -62,7 +87,7 @@ export default async function friendlyRoute(req, res) {
       short: { strengths: 5, issues: 10 },
       full: { strengths: 7, issues: 20 },
     };
-    const limits = limitsMap[mode] || limitsMap.full;
+    const limits = limitsMap[mode] || limitsMap.short;
 
     const prompt = `
 You are an AI SEO expert auditing a webpage for how well it performs in AI-driven search results.
@@ -102,7 +127,7 @@ Instructions:
     });
 
     const rawOutput = completion.choices[0]?.message?.content || '';
-    console.log('🧛‍🤖 GPT OUTPUT:\n', rawOutput);
+    console.log('🧠 GPT OUTPUT:\n', rawOutput);
 
     const jsonText = extractJSONBlock(rawOutput);
     if (!jsonText) throw new Error('Could not extract valid JSON from GPT output.');
