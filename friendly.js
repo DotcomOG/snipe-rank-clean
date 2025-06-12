@@ -1,4 +1,4 @@
-// Last updated: June 11, 2025 @ 3:47 PM ET
+// Last updated: June 11, 2025 @ 16:51 PM ET
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import OpenAI from 'openai';
@@ -105,7 +105,7 @@ export default async function friendlyRoute(req, res) {
     const limits = limitsMap[mode] || limitsMap.short;
 
     const prompt = `
-You are a senior AI SEO consultant. Evaluate the following page and return structured JSON.
+You are a senior AI SEO consultant. Analyze the following page and return structured JSON.
 
 Site: ${finalUrl}
 
