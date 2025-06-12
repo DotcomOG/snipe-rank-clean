@@ -82,23 +82,33 @@ export default async function friendlyRoute(req, res) {
     });
 
     const limitsMap = {
-      short: { strengths: 5, issues: 10 },
-      full: { strengths: 7, issues: 20 },
+      short: {
+        strengths: 5, issues: 10,
+        strengthsLength: "3–5 lines",
+        issuesLength: "5–7 lines",
+        insightsLength: "5–7 lines"
+      },
+      full: {
+        strengths: 7, issues: 20,
+        strengthsLength: "3–5 lines",
+        issuesLength: "8–10 lines",
+        insightsLength: "8–10 lines"
+      }
     };
     const limits = limitsMap[mode] || limitsMap.short;
 
     const prompt = `
-You are a senior AI SEO consultant. You will audit the following website and return structured JSON only.
+You are a senior AI SEO consultant. Analyze the following webpage and return JSON only.
 
 Site URL: ${finalUrl}
 
-Page Title: "${title}"
-Meta Description: "${meta}"
+Title: "${title}"
+Meta: "${meta}"
 H1: "${h1}"
-Body Content:
+Main Text:
 ${bodyText.slice(0, 4000)}
 
-Return only JSON in the following format:
+Return JSON in this format:
 {
   "success": true,
   "score": [integer between 60–95],
@@ -108,11 +118,11 @@ Return only JSON in the following format:
 }
 
 Instructions:
-- Return exactly ${limits.strengths} persuasive short paragraphs in 'ai_strengths'. These should validate and celebrate what the site is doing well for AI SEO, using confident language that affirms the business owner’s success.
-- Return exactly ${limits.issues} persuasive full paragraphs in 'ai_opportunities'. Each item should read like a mini consultation — explaining the problem, why it matters for AI ranking or visibility, and hint at what an expert (like you) could do to fix it. Focus on motivation, clarity, and the business impact of improvement.
-- Avoid technical SEO jargon unless defined simply.
-- Include 5 engine_insights — one full paragraph per engine: Gemini, ChatGPT, Copilot, Claude, Perplexity.
-- Do NOT include any commentary, markdown, or code blocks — return clean JSON only.
+- Return exactly ${limits.strengths} 'ai_strengths' items as persuasive ${limits.strengthsLength} paragraphs.
+- Return exactly ${limits.issues} 'ai_opportunities' items as persuasive ${limits.issuesLength} paragraphs. Frame each as a lost opportunity or visibility problem. Highlight the consequence of inaction and hint at what a professional (like you) could solve.
+- Return 5 'engine_insights' (Gemini, ChatGPT, Copilot, Claude, Perplexity) — each ${limits.insightsLength} long — describing how these AI systems interpret this page and where it falls short.
+- Speak to business owners and CMOs — avoid SEO jargon unless explained. Inspire them to reach out for a full consultation.
+- ✅ Return valid JSON only — no markdown, no code fences.
 `;
 
     const completion = await openai.chat.completions.create({
@@ -120,7 +130,7 @@ Instructions:
       temperature: 0.7,
       max_tokens: 1800,
       messages: [
-        { role: 'system', content: 'You are a persuasive AI SEO consultant writing client-facing audits.' },
+        { role: 'system', content: 'You are a persuasive AI SEO consultant writing conversion-focused audits.' },
         { role: 'user', content: prompt },
       ],
     });
