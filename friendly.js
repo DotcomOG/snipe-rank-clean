@@ -1,4 +1,4 @@
-// Last updated: June 11, 2025 @ 1:58 PM ET
+// Last updated: June 11, 2025 @ 2:54 PM ET
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import OpenAI from 'openai';
@@ -106,12 +106,11 @@ Your task is to return JSON like this:
   "engine_insights": [...]
 }
 
-Instructions:
-- Each item in 'ai_strengths' should be a persuasive short paragraph (2–3 sentences max) highlighting how the site benefits AI visibility.
-- Each item in 'ai_opportunities' should be a persuasive full paragraph (4–5 sentences) written to make a business owner want to contact an expert. Use impact-focused language and avoid technical jargon.
-- Return exactly ${limits.strengths} strengths and ${limits.issues} opportunities.
-- Include 5 engine_insights: 1 paragraph each on how Gemini, ChatGPT, Copilot, Claude, and Perplexity would evaluate this site.
-- ✅ Return ONLY JSON — no code block, no formatting, no commentary.
+Formatting Rules:
+- Each 'ai_strengths' item should be a persuasive 2–3 sentence paragraph showing how the site helps AI understand, trust, or surface it.
+- Each 'ai_opportunities' item must be a full persuasive paragraph (4–6 sentences), framed to highlight the cost of inaction, potential loss of visibility, or missed opportunity. Use client-facing, confident tone. Avoid SEO jargon. Motivate the reader to want to fix it — or reach out to a consultant.
+- Include exactly ${limits.strengths} strengths, ${limits.issues} opportunities, and 5 engine_insights (one each for Gemini, ChatGPT, Copilot, Claude, Perplexity).
+- ✅ Return ONLY JSON — no code blocks, no commentary, no extra text.
 `;
 
     const completion = await openai.chat.completions.create({
