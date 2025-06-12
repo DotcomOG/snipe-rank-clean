@@ -1,110 +1,48 @@
-<!-- Last updated: June 11, 2025 @ 16:52 PM ET -->
+<!-- analyze.html — Last updated: June 11, 2025 @ 4:57 PM ET -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AI SEO Short Report</title>
-  <style>
-    body {
-      font-family: Helvetica, sans-serif;
-      margin: 0;
-      padding: 2rem;
-      background-color: white;
-      color: black;
-    }
-    h1, h2 {
-      text-align: center;
-      margin: 0;
-    }
-    h2 {
-      margin-bottom: 0.5rem;
-    }
-    p.timestamp {
-      text-align: center;
-      font-style: italic;
-      color: gray;
-      margin-top: 0;
-      margin-bottom: 2rem;
-    }
-    .section {
-      margin-bottom: 2.5rem;
-      max-width: 800px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    .centered {
-      text-align: center;
-    }
-    ul {
-      list-style-type: none;
-      padding-left: 0;
-    }
-    li {
-      margin-bottom: 1.25rem;
-      line-height: 1.6;
-    }
-    input {
-      display: block;
-      width: 100%;
-      padding: 0.5rem;
-      margin-top: 0.5rem;
-      margin-bottom: 1rem;
-      font-size: 1rem;
-    }
-    button {
-      padding: 0.75rem 1.5rem;
-      font-size: 1rem;
-      background-color: black;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #444;
-    }
-  </style>
+  <title>AI SEO Report – SnipeRank</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-  <h1>🤖 SnipeRank 🤖</h1>
-  <h2>AI SEO Analyzer</h2>
-  <p class="timestamp">(Test build deployed at 4:36 PM ET)</p>
+<body class="bg-white text-black font-sans">
 
-  <div id="loading" class="centered">SnipeRank is analyzing. It may take up to a minute...</div>
+  <header class="text-center py-8">
+    <h1 class="text-4xl font-bold">SnipeRank</h1>
+    <h2 class="text-xl mt-1 font-medium">AI SEO Analyzer</h2>
+    <p class="text-sm text-gray-500 mt-2">(Short Report – June 11, 2025 @ 4:57 PM ET)</p>
+  </header>
 
-  <div id="results" style="display: none;">
-    <div class="section centered">
-      <p><strong>Tested URL:</strong> <span id="page-url"></span></p>
-    </div>
+  <main class="max-w-4xl mx-auto px-6 py-8 space-y-6">
+    <div id="page-url" class="text-xl font-semibold text-center"></div>
+    <div id="overall-score" class="text-center text-2xl font-bold my-4"></div>
 
-    <div class="section centered">
-      <p><strong>Overall Score:</strong> <span id="overall-score" style="font-size: 1.8rem;"></span></p>
-    </div>
+    <section>
+      <h2 class="text-xl font-bold mt-8 mb-2">What’s Working</h2>
+      <ul id="ai-strengths" class="list-disc list-inside space-y-3"></ul>
+    </section>
 
-    <div class="section">
-      <h3>✅ What’s Working</h3>
-      <ul id="ai-strengths"></ul>
-    </div>
+    <section>
+      <h2 class="text-xl font-bold mt-8 mb-2">Needs Attention</h2>
+      <ul id="ai-opportunities" class="list-disc list-inside space-y-3"></ul>
+    </section>
 
-    <div class="section">
-      <h3>🚨 Needs Attention</h3>
-      <ul id="ai-opportunities"></ul>
-    </div>
+    <section>
+      <h2 class="text-xl font-bold mt-8 mb-2">AI Engine Insights</h2>
+      <ul id="ai-insights" class="list-disc list-inside space-y-3"></ul>
+    </section>
 
-    <div class="section">
-      <h3>🤖 AI Engine Insights</h3>
-      <ul id="ai-insights"></ul>
-    </div>
-
-    <div class="section">
-      <h3 class="centered">📩 Continue to Full Report</h3>
-      <form id="contact-form" class="centered">
-        <input type="text" id="name" name="name" placeholder="Your Full Name" required>
-        <input type="email" id="email" name="email" placeholder="Your Email Address" required>
-        <button type="submit">Continue</button>
+    <section class="mt-12 border-t border-gray-300 pt-8">
+      <h3 class="text-2xl font-semibold mb-4 text-center">Continue to Full Report</h3>
+      <form id="contact-form" class="space-y-4 max-w-xl mx-auto">
+        <input type="text" id="name" name="name" placeholder="Your Full Name" class="w-full p-2 rounded border text-black" required />
+        <input type="email" id="email" name="email" placeholder="Your Email Address" class="w-full p-2 rounded border text-black" required />
+        <button type="submit" class="bg-black text-white px-4 py-2 rounded hover:bg-gray-800 w-full">Continue</button>
       </form>
-    </div>
-  </div>
+    </section>
+  </main>
 
   <script>
     async function runAnalysis() {
@@ -112,7 +50,7 @@
       const url = params.get("url");
 
       if (!url) {
-        document.getElementById("loading").textContent = "No URL provided.";
+        document.getElementById("page-url").textContent = "Missing URL";
         return;
       }
 
@@ -123,39 +61,33 @@
         const data = await res.json();
 
         if (!data.success) {
-          document.getElementById("loading").textContent = "Analysis failed. Please try again.";
+          document.body.innerHTML += "<p class='text-red-500 text-center mt-8'>Analysis failed. Try again.</p>";
           return;
         }
 
-        document.getElementById("overall-score").textContent = data.score;
-
-        const strengthsList = document.getElementById("ai-strengths");
-        const opportunitiesList = document.getElementById("ai-opportunities");
-        const insightsList = document.getElementById("ai-insights");
+        document.getElementById("overall-score").textContent = `Score: ${data.score}`;
 
         (data.ai_strengths || []).forEach(item => {
           const li = document.createElement("li");
           li.textContent = item;
-          strengthsList.appendChild(li);
+          document.getElementById("ai-strengths").appendChild(li);
         });
 
         (data.ai_opportunities || []).forEach(item => {
           const li = document.createElement("li");
           li.textContent = item;
-          opportunitiesList.appendChild(li);
+          document.getElementById("ai-opportunities").appendChild(li);
         });
 
         (data.engine_insights || []).forEach(item => {
           const li = document.createElement("li");
           li.textContent = item;
-          insightsList.appendChild(li);
+          document.getElementById("ai-insights").appendChild(li);
         });
 
-        document.getElementById("loading").style.display = "none";
-        document.getElementById("results").style.display = "block";
       } catch (err) {
         console.error(err);
-        document.getElementById("loading").textContent = "Error fetching analysis.";
+        document.body.innerHTML += "<p class='text-red-500 text-center mt-8'>Error loading report.</p>";
       }
     }
 
