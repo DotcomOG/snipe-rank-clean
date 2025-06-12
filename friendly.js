@@ -1,4 +1,4 @@
-// Last updated: June 11, 2025 @ 16:51 PM ET
+// Last updated: June 11, 2025 @ 17:06 PM ET
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import OpenAI from 'openai';
@@ -85,37 +85,33 @@ export default async function friendlyRoute(req, res) {
       short: {
         strengths: 5,
         issues: 10,
-        sentenceCount: {
-          strengths: 3,
-          issues: 6,
-          insights: 6
-        }
+        minS: 3,
+        minI: 7,
+        minE: 8
       },
       full: {
         strengths: 7,
         issues: 20,
-        sentenceCount: {
-          strengths: 4,
-          issues: 9,
-          insights: 9
-        }
+        minS: 5,
+        minI: 10,
+        minE: 10
       }
     };
 
     const limits = limitsMap[mode] || limitsMap.short;
 
     const prompt = `
-You are a senior AI SEO consultant. Analyze the following page and return structured JSON.
+You are an AI SEO expert creating a client-facing audit of this webpage: ${finalUrl}
 
-Site: ${finalUrl}
-
-Title: "${title}"
-Meta: "${meta}"
-H1: "${h1}"
-Text:
+Here is the context:
+- Title: "${title}"
+- Meta: "${meta}"
+- H1: "${h1}"
+- Page content:
 ${bodyText.slice(0, 4000)}
 
-Return JSON like this:
+INSTRUCTIONS:
+Return JSON like:
 {
   "success": true,
   "score": [60–95],
@@ -124,20 +120,22 @@ Return JSON like this:
   "engine_insights": [...]
 }
 
-Instructions:
-- Each ai_strengths item must be a ${limits.sentenceCount.strengths}-sentence paragraph that speaks confidently and affirms what the site is doing right for AI visibility.
-- Each ai_opportunities item must be a ${limits.sentenceCount.issues}-sentence persuasive paragraph. Emphasize the business risk of ignoring the issue. Make it feel urgent and expensive. End with language that suggests expert help is needed.
-- Each engine_insights item must be a ${limits.sentenceCount.insights}-sentence paragraph, one each for Gemini, ChatGPT, Copilot, Claude, Perplexity. Explain how each engine interprets the site — clearly, no jargon.
-- Use a client-facing tone for business owners, CMOs, or marketing directors.
-- ✅ Return valid JSON only. No markdown, no bullets, no formatting wrappers.
+Content guidelines:
+1. Each ai_strengths item must be a persuasive paragraph with at least ${limits.minS} full sentences. Highlight strengths clearly and show how they help AI understand, trust, or rank the site.
+2. Each ai_opportunities item MUST be a rich paragraph with at least ${limits.minI} full sentences. Do NOT summarize. Each paragraph should feel like part of a real consulting report — explain what’s missing, why it matters, what can go wrong, and hint that professional help is the logical next step.
+3. Each engine_insights item must be at least ${limits.minE} full sentences. Provide detailed, brand-specific insight for Gemini, ChatGPT, Copilot, Claude, and Perplexity.
+4. Your tone is smart, persuasive, client-facing. You're writing to marketing executives, not developers.
+5. Do NOT use bullets. Do NOT wrap in code blocks. Return raw JSON only — no formatting, no markdown.
+
+FAILURE TO FOLLOW ANY SENTENCE COUNT REQUIREMENTS SHOULD BE CONSIDERED AN INVALID RESPONSE.
 `;
 
     const completion = await openai.chat.completions.create({
       model: 'gpt-4-turbo',
       temperature: 0.7,
-      max_tokens: 2000,
+      max_tokens: 3000,
       messages: [
-        { role: 'system', content: 'You are an AI SEO consultant writing persuasive audit reports for business leaders.' },
+        { role: 'system', content: 'You are an AI SEO consultant creating persuasive full-length audits for business leaders.' },
         { role: 'user', content: prompt },
       ],
     });
