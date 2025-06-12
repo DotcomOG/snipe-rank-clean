@@ -1,4 +1,4 @@
-// Last updated: June 11, 2025 @ 13:11 PM ET
+// Last updated: June 11, 2025 @ 13:32 PM ET
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import OpenAI from 'openai';
@@ -14,7 +14,6 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-// Secure URL validator — blocks localhost/IPs and invalid schemes
 function isValidPublicUrl(input) {
   try {
     const parsed = new URL(input);
@@ -32,6 +31,25 @@ function isValidPublicUrl(input) {
   }
 }
 
+async function resolveFinalURL(initialUrl, maxHops = 5) {
+  let currentUrl = initialUrl;
+  for (let i = 0; i < maxHops; i++) {
+    const response = await axios.head(currentUrl, {
+      maxRedirects: 0,
+      validateStatus: () => true,
+    });
+
+    if ([301, 302, 303, 307, 308].includes(response.status)) {
+      const location = response.headers.location;
+      if (!location) break;
+      currentUrl = new URL(location, currentUrl).toString();
+    } else {
+      return currentUrl; // 200 OK
+    }
+  }
+  return currentUrl; // fallback to last reached URL
+}
+
 function extractJSONBlock(text) {
   const match =
     text.match(/```(?:json)?\s*({[\s\S]*?})\s*```/) ||
@@ -47,29 +65,15 @@ export default async function friendlyRoute(req, res) {
   }
 
   try {
-    // HEAD request to resolve initial redirect
-    const headRes = await axios.head(url, {
-      maxRedirects: 0,
-      validateStatus: () => true,
-    });
-
-    const redirectStatuses = [301, 302, 303, 307, 308];
-    const resolvedUrl =
-      redirectStatuses.includes(headRes.status) && headRes.headers.location
-        ? new URL(headRes.headers.location, url).toString()
-        : url;
-
-    // GET content with headers
-    const getRes = await axios.get(resolvedUrl, {
+    const finalUrl = await resolveFinalURL(url);
+    const getRes = await axios.get(finalUrl, {
       timeout: 10000,
-      maxRedirects: 5,
       headers: {
         "User-Agent":
           "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36",
       },
     });
 
-    const finalUrl = getRes.request?.res?.responseUrl || resolvedUrl;
     const html = getRes.data;
     const $ = cheerio.load(html);
 
