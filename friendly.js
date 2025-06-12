@@ -1,4 +1,4 @@
-// Last updated: June 11, 2025 @ 15:42 PM ET
+// Last updated: June 11, 2025 @ 3:47 PM ET
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import OpenAI from 'openai';
@@ -33,7 +33,8 @@ function isValidPublicUrl(input) {
 
 function extractJSONBlock(text) {
   const match =
-    text.match(/```(?:json)?\s*({[\s\S]*?})\s*```/) || text.match(/({[\s\S]*})/);
+    text.match(/```(?:json)?\s*({[\s\S]*?})\s*```/) ||
+    text.match(/({[\s\S]*})/);
   return match ? match[1] : null;
 }
 
@@ -87,17 +88,17 @@ export default async function friendlyRoute(req, res) {
     const limits = limitsMap[mode] || limitsMap.short;
 
     const prompt = `
-You are an AI SEO expert auditing a webpage for how well it performs in AI-driven search results.
+You are a senior AI SEO consultant. You will audit the following website and return structured JSON only.
 
-Here is the page content from: ${finalUrl}
+Site URL: ${finalUrl}
 
-Title: "${title}"
-Meta: "${meta}"
+Page Title: "${title}"
+Meta Description: "${meta}"
 H1: "${h1}"
-Content:
+Body Content:
 ${bodyText.slice(0, 4000)}
 
-Your task is to return JSON like this:
+Return only JSON in the following format:
 {
   "success": true,
   "score": [integer between 60–95],
@@ -106,11 +107,12 @@ Your task is to return JSON like this:
   "engine_insights": [...]
 }
 
-Formatting Rules:
-- Each 'ai_strengths' item should be a persuasive 2–3 sentence paragraph showing how the site helps AI understand, trust, or surface it.
-- Each 'ai_opportunities' item must be a full persuasive paragraph (4–6 sentences), framed to highlight the cost of inaction, potential loss of visibility, or missed opportunity. Use client-facing, confident tone. Avoid SEO jargon. Motivate the reader to want to fix it — or reach out to a consultant.
-- Include exactly ${limits.strengths} strengths, ${limits.issues} opportunities, and 5 engine_insights (one each for Gemini, ChatGPT, Copilot, Claude, Perplexity).
-- ✅ Return ONLY JSON — no code blocks, no commentary, no extra text.
+Instructions:
+- Return exactly ${limits.strengths} persuasive short paragraphs in 'ai_strengths'. These should validate and celebrate what the site is doing well for AI SEO, using confident language that affirms the business owner’s success.
+- Return exactly ${limits.issues} persuasive full paragraphs in 'ai_opportunities'. Each item should read like a mini consultation — explaining the problem, why it matters for AI ranking or visibility, and hint at what an expert (like you) could do to fix it. Focus on motivation, clarity, and the business impact of improvement.
+- Avoid technical SEO jargon unless defined simply.
+- Include 5 engine_insights — one full paragraph per engine: Gemini, ChatGPT, Copilot, Claude, Perplexity.
+- Do NOT include any commentary, markdown, or code blocks — return clean JSON only.
 `;
 
     const completion = await openai.chat.completions.create({
@@ -118,7 +120,7 @@ Formatting Rules:
       temperature: 0.7,
       max_tokens: 1800,
       messages: [
-        { role: 'system', content: 'You are a helpful AI SEO analysis assistant.' },
+        { role: 'system', content: 'You are a persuasive AI SEO consultant writing client-facing audits.' },
         { role: 'user', content: prompt },
       ],
     });
