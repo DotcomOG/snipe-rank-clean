@@ -1,4 +1,4 @@
-// Last updated: June 11, 2025 @ 1:35 PM ET
+// Last updated: June 11, 2025 @ 1:58 PM ET
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import OpenAI from 'openai';
@@ -7,16 +7,13 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 if (!process.env.OPENAI_API_KEY) {
-  throw new Error(
-    '❌ OPENAI_API_KEY is missing. Please set it in your Render or .env configuration.'
-  );
+  throw new Error('❌ OPENAI_API_KEY is missing. Please set it in your Render or .env configuration.');
 }
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-// Secure URL validator — blocks localhost/IPs and invalid schemes
 function isValidPublicUrl(input) {
   try {
     const parsed = new URL(input);
@@ -34,7 +31,6 @@ function isValidPublicUrl(input) {
   }
 }
 
-// Extract JSON from GPT content
 function extractJSONBlock(text) {
   const match =
     text.match(/```(?:json)?\s*({[\s\S]*?})\s*```/) || text.match(/({[\s\S]*})/);
@@ -49,7 +45,6 @@ export default async function friendlyRoute(req, res) {
   }
 
   try {
-    // HEAD request to resolve initial redirect
     const headRes = await axios.head(url, {
       maxRedirects: 0,
       validateStatus: () => true,
@@ -61,7 +56,6 @@ export default async function friendlyRoute(req, res) {
         ? new URL(headRes.headers.location, url).toString()
         : url;
 
-    // GET content with headers
     const getRes = await axios.get(resolvedUrl, {
       timeout: 10000,
       maxRedirects: 5,
@@ -103,7 +97,7 @@ H1: "${h1}"
 Content:
 ${bodyText.slice(0, 4000)}
 
-Your task is to evaluate it and return JSON like this:
+Your task is to return JSON like this:
 {
   "success": true,
   "score": [integer between 60–95],
@@ -113,10 +107,11 @@ Your task is to evaluate it and return JSON like this:
 }
 
 Instructions:
-- Return exactly ${limits.strengths} 'ai_strengths'
-- Return exactly ${limits.issues} 'ai_opportunities'
-- Return 5 engine_insights (Gemini, ChatGPT, Copilot, Claude, Perplexity)
-- ✅ RETURN ONLY VALID JSON. Do NOT wrap it in \`\`\` or any code block.
+- Each item in 'ai_strengths' should be a persuasive short paragraph (2–3 sentences max) highlighting how the site benefits AI visibility.
+- Each item in 'ai_opportunities' should be a persuasive full paragraph (4–5 sentences) written to make a business owner want to contact an expert. Use impact-focused language and avoid technical jargon.
+- Return exactly ${limits.strengths} strengths and ${limits.issues} opportunities.
+- Include 5 engine_insights: 1 paragraph each on how Gemini, ChatGPT, Copilot, Claude, and Perplexity would evaluate this site.
+- ✅ Return ONLY JSON — no code block, no formatting, no commentary.
 `;
 
     const completion = await openai.chat.completions.create({
