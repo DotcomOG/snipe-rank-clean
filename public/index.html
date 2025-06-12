@@ -1,4 +1,4 @@
-<!-- Last updated: June 11, 2025 @ 2:44 PM ET -->
+<!-- Last updated: June 11, 2025 @ 4:36 PM ET -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,54 +10,71 @@
       font-family: Helvetica, sans-serif;
       background-color: white;
       color: black;
+      margin: 0;
+      padding: 3rem 2rem;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      padding: 2rem;
-      margin: 0;
-    }
-    h1, h2 {
-      text-align: center;
-      margin: 0;
-    }
-    h2 {
-      margin-bottom: 1rem;
-    }
-    p.description {
-      max-width: 600px;
-      text-align: center;
-      font-size: 1rem;
-      margin: 0 auto 2rem auto;
       line-height: 1.6;
     }
+
+    h1, h2 {
+      text-align: center;
+      font-weight: bold;
+      margin: 0;
+    }
+
+    h2 {
+      margin-bottom: 1.25rem;
+    }
+
+    .description {
+      max-width: 700px;
+      text-align: center;
+      font-size: 1.05rem;
+      margin-bottom: 3rem;
+      color: #333;
+    }
+
     form {
       display: flex;
       flex-direction: column;
       align-items: center;
+      gap: 1rem;
+      width: 100%;
+      max-width: 480px;
     }
+
     input {
+      width: 100%;
       padding: 0.75rem;
-      margin-top: 0.5rem;
-      width: 320px;
       font-size: 1rem;
+      border: 1px solid #ccc;
     }
+
     button {
-      margin-top: 1rem;
-      padding: 0.75rem 1.5rem;
-      font-size: 1rem;
       background-color: black;
       color: white;
+      font-size: 1rem;
+      padding: 0.75rem 1.5rem;
       border: none;
       cursor: pointer;
     }
+
     button:hover {
       background-color: #333;
     }
+
     .error {
       color: red;
-      margin-top: 1rem;
+      font-size: 0.95rem;
+    }
+
+    .timestamp {
+      font-style: italic;
+      color: gray;
+      font-size: 0.9rem;
+      margin-top: 2rem;
     }
   </style>
 </head>
@@ -66,16 +83,18 @@
   <h2>AI SEO Analyzer</h2>
 
   <p class="description">
-    This tool evaluates how well your website is optimized for AI-driven search engines like Google Gemini, ChatGPT, Claude, and Perplexity.
-    You’ll receive a fast summary followed by a detailed report identifying strengths and areas for improvement — all designed to help
-    you attract more organic traffic, appear in generative AI answers, and stay ahead of algorithm changes.
+    SnipeRank evaluates how well your website is optimized for AI-powered search engines like ChatGPT, Gemini, Claude, and Perplexity. 
+    You'll receive a clear, strategic summary of what's working, what needs attention, and how AI interprets your brand — designed not just to diagnose, but to convert. 
+    It's a powerful first step toward better visibility, more traffic, and smarter positioning.
   </p>
 
   <form id="analyze-form">
-    <input type="text" id="url" name="url" placeholder="Enter your website URL" required>
+    <input type="text" id="url" name="url" placeholder="Enter your website URL (e.g., example.com)" required>
     <button type="submit">Run AI SEO Analysis</button>
     <div id="error-message" class="error"></div>
   </form>
+
+  <div class="timestamp">(Last updated: June 11, 2025 @ 4:36 PM ET)</div>
 
   <script>
     function isValidURL(input) {
@@ -90,7 +109,7 @@
       const errorDiv = document.getElementById("error-message");
 
       if (!isValidURL(url)) {
-        errorDiv.textContent = "Please enter a valid URL (e.g., example.com)";
+        errorDiv.textContent = "Please enter a valid website (e.g., example.com)";
         return;
       }
 
@@ -98,8 +117,7 @@
         url = "https://" + url;
       }
 
-      // Hardcoded test branch URL to ensure correct preview build
-      window.location.href = `https://snipe-rank-clean-git-test-index-yoram-ezras-projects.vercel.app/analyze.html?url=${encodeURIComponent(url)}`;
+      window.location.href = `analyze.html?url=${encodeURIComponent(url)}`;
     });
   </script>
 </body>
