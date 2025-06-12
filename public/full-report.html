@@ -1,10 +1,10 @@
-<!-- full-report.html — Updated 2025-06-10 @ 3:55 PM ET -->
+<!-- Last updated: June 11, 2025 @ 1:52 PM ET -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Full Report – SnipeRank</title>
+  <title>Full AI SEO Report</title>
   <style>
     body {
       font-family: Helvetica, sans-serif;
@@ -18,7 +18,7 @@
       margin: 0;
     }
     h2 {
-      margin-bottom: 1rem;
+      margin-bottom: 1.5rem;
     }
     .section {
       margin-bottom: 2.5rem;
@@ -34,15 +34,8 @@
       padding-left: 0;
     }
     li {
-      margin-bottom: 1.5rem;
-      line-height: 1.6;
-      font-size: 1rem;
-    }
-    .row-line {
-      text-align: center;
-      font-weight: bold;
-      font-size: 1rem;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1.25rem;
+      line-height: 1.5;
     }
     input, textarea {
       display: block;
@@ -61,7 +54,7 @@
       cursor: pointer;
     }
     button:hover {
-      background-color: #333;
+      background-color: #444;
     }
     .score-line {
       text-align: center;
@@ -78,9 +71,8 @@
   <div id="loading" class="centered">Please wait while we generate your detailed report...</div>
 
   <div id="results" style="display: none;">
-
-    <div class="section">
-      <div class="row-line">Tested URL: <span id="page-url"></span></div>
+    <div class="section centered">
+      <p><strong>Tested URL:</strong> <span id="page-url"></span></p>
     </div>
 
     <div class="section">
@@ -88,12 +80,12 @@
     </div>
 
     <div class="section">
-      <h3>What’s Working</h3>
+      <h3>✅ What’s Working</h3>
       <ul id="ai-strengths"></ul>
     </div>
 
     <div class="section">
-      <h3>Needs Attention</h3>
+      <h3>🚨 Needs Attention</h3>
       <ul id="ai-opportunities"></ul>
     </div>
 
@@ -103,7 +95,7 @@
     </div>
 
     <div class="section">
-      <h3 class="centered">Request Your Full Report</h3>
+      <h3 class="centered">📩 Complete Your Request</h3>
       <form id="contact-form" class="centered" method="POST" action="https://formspree.io/f/mayzkzed">
         <input type="text" id="name" name="name" placeholder="Your Full Name" required>
         <input type="email" id="email" name="email" placeholder="Your Email Address" required>
@@ -132,7 +124,7 @@
       document.getElementById("email").value = decodeURIComponent(email);
 
       try {
-        const res = await fetch(`https://snipe-rank-clean.onrender.com/friendly?url=${encodeURIComponent(url)}`);
+        const res = await fetch(`https://snipe-rank-clean.onrender.com/friendly?url=${encodeURIComponent(url)}&mode=full`);
         const data = await res.json();
 
         if (!data.success) {
@@ -142,28 +134,28 @@
 
         document.getElementById("overall-score").textContent = data.score;
 
-        const strengths = data.ai_strengths?.slice(0, 7) || [];
-        const opportunities = data.ai_opportunities?.slice(0, 20) || [];
+        const strengths = (data.ai_strengths || []).slice(0, 7);
+        const opportunities = (data.ai_opportunities || []).slice(0, 20);
         const insights = data.engine_insights || [];
 
         const strengthsList = document.getElementById("ai-strengths");
         strengths.forEach(item => {
           const li = document.createElement("li");
-          li.textContent = typeof item === 'string' ? item : JSON.stringify(item);
+          li.textContent = typeof item === "string" ? item : JSON.stringify(item);
           strengthsList.appendChild(li);
         });
 
         const opportunitiesList = document.getElementById("ai-opportunities");
         opportunities.forEach(item => {
           const li = document.createElement("li");
-          li.textContent = typeof item === 'string' ? item : JSON.stringify(item);
+          li.textContent = typeof item === "string" ? item : JSON.stringify(item);
           opportunitiesList.appendChild(li);
         });
 
         const insightsList = document.getElementById("ai-insights");
         insights.forEach(item => {
           const li = document.createElement("li");
-          li.textContent = typeof item === 'string' ? item : JSON.stringify(item);
+          li.textContent = typeof item === "string" ? item : JSON.stringify(item);
           insightsList.appendChild(li);
         });
 
@@ -172,7 +164,7 @@
 
       } catch (err) {
         console.error(err);
-        document.getElementById("loading").textContent = "Error fetching report.";
+        document.getElementById("loading").textContent = "Error fetching full report.";
       }
     }
 
