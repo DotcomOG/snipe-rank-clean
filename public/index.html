@@ -1,9 +1,9 @@
-<!-- index.html — Updated 2025-06-10 @ 3:20 PM ET -->
+<!-- Last updated: June 11, 2025 @ 1:42 PM ET -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>SnipeRank — AI SEO Analyzer</title>
   <style>
     body {
@@ -19,17 +19,20 @@
     }
     h1, h2 {
       text-align: center;
+      margin: 0;
+    }
+    h2 {
+      margin-bottom: 1.5rem;
     }
     form {
-      margin-top: 2rem;
       display: flex;
       flex-direction: column;
       align-items: center;
     }
     input {
-      margin: 0.5rem 0;
       padding: 0.75rem;
-      width: 300px;
+      margin-top: 0.5rem;
+      width: 320px;
       font-size: 1rem;
     }
     button {
@@ -73,7 +76,7 @@
       const errorDiv = document.getElementById("error-message");
 
       if (!isValidURL(url)) {
-        errorDiv.textContent = "Please enter a valid website URL (e.g., example.com or https://example.com)";
+        errorDiv.textContent = "Please enter a valid URL (e.g., example.com)";
         return;
       }
 
