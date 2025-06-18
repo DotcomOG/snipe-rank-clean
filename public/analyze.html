@@ -1,4 +1,4 @@
-<!-- analyze.html — Last updated: June 11, 2025 @ 4:57 PM ET -->
+<!-- analyze.html — Last updated: June 18, 2025 @ 2:25 PM ET -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,36 +12,39 @@
   <header class="text-center py-8">
     <h1 class="text-4xl font-bold">SnipeRank</h1>
     <h2 class="text-xl mt-1 font-medium">AI SEO Analyzer</h2>
-    <p class="text-sm text-gray-500 mt-2">(Short Report – June 11, 2025 @ 4:57 PM ET)</p>
   </header>
 
   <main class="max-w-4xl mx-auto px-6 py-8 space-y-6">
-    <div id="page-url" class="text-xl font-semibold text-center"></div>
-    <div id="overall-score" class="text-center text-2xl font-bold my-4"></div>
+    <div id="loading" class="text-center text-lg font-medium text-gray-600">Please wait — analyzing your site...</div>
 
-    <section>
-      <h2 class="text-xl font-bold mt-8 mb-2">What’s Working</h2>
-      <ul id="ai-strengths" class="list-disc list-inside space-y-3"></ul>
-    </section>
+    <div id="results" style="display:none;">
+      <div id="page-url" class="text-xl font-semibold text-center"></div>
+      <div id="overall-score" class="text-center text-2xl font-bold my-4"></div>
 
-    <section>
-      <h2 class="text-xl font-bold mt-8 mb-2">Needs Attention</h2>
-      <ul id="ai-opportunities" class="list-disc list-inside space-y-3"></ul>
-    </section>
+      <section>
+        <h2 class="text-xl font-bold mt-8 mb-2">What’s Working</h2>
+        <ul id="ai-strengths" class="list-disc list-inside space-y-3"></ul>
+      </section>
 
-    <section>
-      <h2 class="text-xl font-bold mt-8 mb-2">AI Engine Insights</h2>
-      <ul id="ai-insights" class="list-disc list-inside space-y-3"></ul>
-    </section>
+      <section>
+        <h2 class="text-xl font-bold mt-8 mb-2">Needs Attention</h2>
+        <ul id="ai-opportunities" class="list-disc list-inside space-y-3"></ul>
+      </section>
 
-    <section class="mt-12 border-t border-gray-300 pt-8">
-      <h3 class="text-2xl font-semibold mb-4 text-center">Continue to Full Report</h3>
-      <form id="contact-form" class="space-y-4 max-w-xl mx-auto">
-        <input type="text" id="name" name="name" placeholder="Your Full Name" class="w-full p-2 rounded border text-black" required />
-        <input type="email" id="email" name="email" placeholder="Your Email Address" class="w-full p-2 rounded border text-black" required />
-        <button type="submit" class="bg-black text-white px-4 py-2 rounded hover:bg-gray-800 w-full">Continue</button>
-      </form>
-    </section>
+      <section>
+        <h2 class="text-xl font-bold mt-8 mb-2">AI Engine Insights</h2>
+        <ul id="ai-insights" class="list-disc list-inside space-y-3"></ul>
+      </section>
+
+      <section class="mt-12 border-t border-gray-300 pt-8">
+        <h3 class="text-2xl font-semibold mb-4 text-center">Continue to Full Report</h3>
+        <form id="contact-form" class="space-y-4 max-w-xl mx-auto">
+          <input type="text" id="name" name="name" placeholder="Your Full Name" class="w-full p-2 rounded border text-black" required />
+          <input type="email" id="email" name="email" placeholder="Your Email Address" class="w-full p-2 rounded border text-black" required />
+          <button type="submit" class="bg-black text-white px-4 py-2 rounded hover:bg-gray-800 w-full">Continue</button>
+        </form>
+      </section>
+    </div>
   </main>
 
   <script>
@@ -49,10 +52,7 @@
       const params = new URLSearchParams(window.location.search);
       const url = params.get("url");
 
-      if (!url) {
-        document.getElementById("page-url").textContent = "Missing URL";
-        return;
-      }
+      if (!url) return;
 
       document.getElementById("page-url").textContent = decodeURIComponent(url);
 
@@ -60,10 +60,7 @@
         const res = await fetch(`https://snipe-rank-clean.onrender.com/friendly?url=${encodeURIComponent(url)}&mode=short`);
         const data = await res.json();
 
-        if (!data.success) {
-          document.body.innerHTML += "<p class='text-red-500 text-center mt-8'>Analysis failed. Try again.</p>";
-          return;
-        }
+        if (!data.success) throw new Error("Invalid response");
 
         document.getElementById("overall-score").textContent = `Score: ${data.score}`;
 
@@ -85,9 +82,11 @@
           document.getElementById("ai-insights").appendChild(li);
         });
 
+        document.getElementById("loading").style.display = "none";
+        document.getElementById("results").style.display = "block";
       } catch (err) {
         console.error(err);
-        document.body.innerHTML += "<p class='text-red-500 text-center mt-8'>Error loading report.</p>";
+        document.getElementById("loading").textContent = "Analysis failed. Please try again.";
       }
     }
 

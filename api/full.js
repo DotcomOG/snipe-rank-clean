@@ -1,61 +1,78 @@
-// =========================
-// ✅ api/full.js
-// @vercel/node@20
-// =========================
+// api/full.js — Last updated: June 18, 2025 @ 2:25 PM ET
 import OpenAI from 'openai';
+import dotenv from 'dotenv';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 
+dotenv.config();
+
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+function countSentences(text) {
+  return (text.match(/[.?!]\s/g) || []).length + 1;
+}
+
+function validateOutput(data, limits) {
+  const validStrengths = Array.isArray(data.ai_strengths) && data.ai_strengths.every(p => countSentences(p) >= limits.minS);
+  const validOpps = Array.isArray(data.ai_opportunities) && data.ai_opportunities.every(p => countSentences(p) >= limits.minO);
+  const validInsights = Array.isArray(data.engine_insights) && data.engine_insights.every(p => countSentences(p) >= limits.minE);
+  return validStrengths && validOpps && validInsights;
+}
 
 export default async function handler(req, res) {
   const { url } = req.query;
-  if (!url) return res.status(400).json({ error: 'URL is required.' });
+  const limits = { minS: 3, minO: 7, minE: 8 };
 
-  const run = async () => {
-    try {
-      new URL(url);
-    } catch {
-      return res.status(400).json({ error: 'Invalid URL format.' });
-    }
+  if (!url) return res.status(400).json({ success: false, error: "Missing URL" });
 
-    let html = '';
-    try {
-      const response = await axios.get(url, { timeout: 8000 });
-      html = response.data;
-    } catch (err) {
-      console.error('❌ axios error (full):', err.message);
-      return res.status(500).json({ error: 'Failed to fetch content.', detail: err.message });
-    }
-
+  try {
+    const html = (await axios.get(url)).data;
     const $ = cheerio.load(html);
-    const bodyText = $('body').text().replace(/\s+/g, ' ').trim().slice(0, 7000);
+    const bodyText = $('p').map((_, el) => $(el).text()).get().join("\n");
 
-    const prompt = `You are an AI SEO expert. Analyze this content deeply: \n\n\"${bodyText}\" \n\nReturn JSON with score (1-100), 5 detailed superpowers (3–5 sentences each), 10 detailed opportunities (5–6 sentences each), and 5 AI engine insights (1 per line: Gemini, ChatGPT, Claude, Copilot, Perplexity).`;
+    const prompt = `
+You are an AI SEO consultant preparing a full audit of this website: ${url}
 
-    let output = '';
-    try {
-      const chat = await openai.chat.completions.create({
-        model: 'gpt-3.5-turbo',
-        temperature: 0.7,
-        messages: [{ role: 'user', content: prompt }]
-      });
-      output = chat.choices[0].message.content;
-      console.log('✅ OpenAI Output (full):', output);
-    } catch (err) {
-      console.error('❌ OpenAI full.js error:', err.message);
-      return res.status(500).json({ error: 'OpenAI request failed.', detail: err.message });
+Instructions:
+Return ONLY valid JSON with this structure:
+{
+  "success": true,
+  "score": [number between 60–95],
+  "ai_strengths": [7 items, each at least ${limits.minS} full sentences],
+  "ai_opportunities": [20 items, each at least ${limits.minO} sentences],
+  "engine_insights": [5 items, each at least ${limits.minE} sentences]
+}
+Tone: professional, persuasive, client-facing. Avoid technical jargon. Do not wrap in code blocks or bullets.
+
+Content:
+${bodyText.slice(0, 4000)}
+`;
+
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4-turbo',
+      temperature: 0.7,
+      max_tokens: 2500,
+      messages: [
+        { role: 'system', content: 'You are a professional AI SEO analyst.' },
+        { role: 'user', content: prompt }
+      ]
+    });
+
+    const raw = completion.choices[0].message.content.trim();
+
+    const json = raw.startsWith("```") ? raw.replace(/```json|```/g, "").trim() : raw;
+    const parsed = JSON.parse(json);
+
+    if (!validateOutput(parsed, limits)) {
+      return res.status(500).json({ success: false, error: 'AI output did not meet length requirements', raw });
     }
 
-    try {
-      const parsed = JSON.parse(output);
-      parsed.url = url;
-      return res.status(200).json(parsed);
-    } catch (err) {
-      console.error('❌ Failed to parse OpenAI output:', output);
-      return res.status(500).json({ error: 'Invalid JSON from OpenAI', raw: output });
-    }
-  };
+    parsed.success = true;
+    parsed.score = Math.max(60, Math.min(95, parseInt(parsed.score, 10) || 60));
+    return res.json(parsed);
 
-  return run();
+  } catch (err) {
+    console.error("🔥 /api/full error:", err.message);
+    return res.status(500).json({ success: false, error: err.message });
+  }
 }
