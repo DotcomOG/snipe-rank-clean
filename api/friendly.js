@@ -1,4 +1,4 @@
-// 📄 friendly.js — Updated June 19, 2025 @ 11:30 AM ET
+// 📄 friendly.js — Updated June 19, 2025 @ 2:40 PM ET
 
 import OpenAI from 'openai';
 import axios from 'axios';
@@ -6,7 +6,6 @@ import * as cheerio from 'cheerio';
 import express from 'express';
 
 const router = express.Router();
-
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 function extractVisibleText(html) {
@@ -54,9 +53,9 @@ function validateStructure(data) {
   return true;
 }
 
-router.get('/api/friendly', async (req, res) => {
+router.get('/friendly', async (req, res) => {
   const url = req.query.url;
-  if (!url || !/^https?:\/\//.test(url)) {
+  if (!url || !/^https?:\\/\\//.test(url)) {
     return res.status(400).json({ error: 'Invalid or missing URL parameter' });
   }
 
@@ -66,8 +65,7 @@ router.get('/api/friendly', async (req, res) => {
     });
     const visibleText = extractVisibleText(htmlResponse.data);
 
-    const prompt = `You are an expert in AI SEO analysis. Based on the following website content, generate a JSON response with the structure below. Each section must be persuasive, detailed, and meet line count rules:\n\nContent:\n"""${visibleText.slice(0, 7000)}"""\n\nRespond only in JSON:\n{\n  "ai_superpowers": [\n    { "title": "...", "explanation": "..." } // x5, 3+ lines each\n  ],\n  "ai_opportunities": [\n    { "title": "...", "explanation": "..." } // x10, 3–5 lines each\n  ],\n  "ai_engine_insights": {\n    "ChatGPT": "...",\n    "Claude": "...",\n    "Google Gemini": "...",\n    "Microsoft Copilot": "...",\n    "Perplexity": "..."\n  } // each 5+ lines of text
-}`;
+    const prompt = `You are an expert in AI SEO analysis. Based on the following website content, generate a JSON response with the structure below. Each section must be persuasive, detailed, and meet line count rules:\\n\\nContent:\\n\"\"\"${visibleText.slice(0, 7000)}\"\"\"\\n\\nRespond only in JSON:\\n{\\n  \"ai_superpowers\": [\\n    { \"title\": \"...\", \"explanation\": \"...\" } // x5, 3+ lines each\\n  ],\\n  \"ai_opportunities\": [\\n    { \"title\": \"...\", \"explanation\": \"...\" } // x10, 3–5 lines each\\n  ],\\n  \"ai_engine_insights\": {\\n    \"ChatGPT\": \"...\",\\n    \"Claude\": \"...\",\\n    \"Google Gemini\": \"...\",\\n    \"Microsoft Copilot\": \"...\",\\n    \"Perplexity\": \"...\"\\n  } // each 5+ lines of text\n}`;
 
     const completion = await openai.chat.completions.create({
       model: 'gpt-4-turbo',
