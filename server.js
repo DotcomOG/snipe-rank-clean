@@ -21,4 +21,4 @@ app.get("/friendly", friendlyRoute);
 
 app.listen(PORT, () => {
   console.log(`✅ Server running on http://localhost:${PORT}`);
-});
+});// 🟢 Force change to trigger Render deploy
